@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>BAGMAN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--s:2;--bg:#000;--gold:#f7c948;--pink:#ff5fa2;--blue:#3060ff;--cyan:#35e0ff;--dim:#7d84a3}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:#fff;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-items:center;justify-content:center;padding:16px}
+#wrap{display:flex;flex-direction:column;align-items:center}
+#hud{display:flex;justify-content:space-between;align-items:flex-end;width:100%;height:calc(var(--s)*26px);padding-bottom:calc(var(--s)*4px);font-size:calc(var(--s)*7px);line-height:1.5}
+#hud .lbl{color:var(--pink)}
+#hud .mid{text-align:center}
+#hud .right{text-align:right}
+#lives{display:flex;gap:calc(var(--s)*2px);justify-content:flex-end;min-height:calc(var(--s)*11px)}
+#lives canvas{width:calc(var(--s)*11px);height:calc(var(--s)*11px)}
+#stage{position:relative;overflow:hidden}
+#game{display:block}
+#foot{margin-top:10px;font-size:8px;color:var(--dim);text-align:center;line-height:1.8}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(0,0,0,.86);gap:calc(var(--s)*6px);cursor:pointer}
+.overlay.hidden{display:none}
+.logo{font-size:calc(var(--s)*28px);color:var(--gold);text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 var(--pink),calc(var(--s)*-1px) calc(var(--s)*-1px) 0 var(--blue);letter-spacing:calc(var(--s)*1px)}
+.tag{font-size:calc(var(--s)*7px);line-height:1.7}
+.edition{font-size:calc(var(--s)*6px);color:var(--bg);background:var(--gold);padding:calc(var(--s)*3px) calc(var(--s)*5px)}
+.cast{display:grid;grid-template-columns:auto auto;gap:calc(var(--s)*3px) calc(var(--s)*6px);align-items:center;text-align:left;margin-top:calc(var(--s)*2px)}
+.cast canvas{width:calc(var(--s)*22px);height:calc(var(--s)*22px)}
+.cast .n{font-size:calc(var(--s)*6px);line-height:1.6}
+.cast .d{font-size:calc(var(--s)*5px);color:var(--dim)}
+.blink{font-size:calc(var(--s)*7px);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.link{font-size:calc(var(--s)*5px);color:var(--dim);text-decoration:underline;cursor:pointer}
+.go-title{font-size:calc(var(--s)*16px);color:#ff3b3b;text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 #600}
+.go-face{width:calc(var(--s)*48px);height:calc(var(--s)*48px)}
+.go-killer{font-size:calc(var(--s)*7px);line-height:1.7}
+.go-bag{font-size:calc(var(--s)*14px);color:var(--gold)}
+.go-small{font-size:calc(var(--s)*6px);color:var(--dim);line-height:1.8}
+#credits{cursor:default;padding:calc(var(--s)*10px)}
+#credits h2{font-size:calc(var(--s)*8px);color:var(--gold);font-weight:400}
+#credits ul{list-style:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:calc(var(--s)*5.5px);line-height:1.55;color:#d5d9ea;text-align:left}
+#credits li{margin-bottom:calc(var(--s)*3px)}
+#credits a{color:var(--cyan)}
+#credits p{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:calc(var(--s)*5px);color:var(--dim)}
+#credits button{font-family:inherit;font-size:calc(var(--s)*6px);background:var(--gold);color:#000;border:0;padding:calc(var(--s)*3px) calc(var(--s)*6px);cursor:pointer}
+#pump{position:absolute;left:0;right:0;top:40%;text-align:center;font-size:calc(var(--s)*22px);color:var(--gold);text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 var(--pink);opacity:0;pointer-events:none}
+#pump.go{animation:pump .9s ease-out}
+@keyframes pump{0%{opacity:0;transform:scale(.3)}20%{opacity:1;transform:scale(1.2)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+#tweet{position:absolute;left:50%;top:calc(var(--s)*4px);transform:translate(-50%,-180%);transition:transform .22s ease-out;background:#0f1419;border:1px solid #2f3336;border-radius:calc(var(--s)*5px);padding:calc(var(--s)*4px) calc(var(--s)*7px) calc(var(--s)*4px) calc(var(--s)*4px);display:flex;gap:calc(var(--s)*4px);align-items:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.6)}
+#tweet.show{transform:translate(-50%,0)}
+#tweet canvas{width:calc(var(--s)*15px);height:calc(var(--s)*15px)}
+#tweet .tn{font-size:calc(var(--s)*5px);font-weight:700;color:#e7e9ea}
+#tweet .tn span{font-weight:400;color:#71767b}
+#tweet .tt{font-size:calc(var(--s)*7px);color:#e7e9ea;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <div><div class="lbl">BAG</div><div id="score">Ð0</div></div>
+    <div class="mid"><div class="lbl">HI</div><div id="hi">Ð0</div></div>
+    <div class="right"><div class="lbl">LVL <span id="lvl">1</span></div><div id="lives"></div></div>
+  </div>
+  <div id="stage">
+    <canvas id="game"></canvas>
+    <div id="pump">PUMP!</div>
+    <div id="tweet"><canvas id="avatar"></canvas><div><div class="tn">Elon <span>@elon · now</span></div><div class="tt" id="tweetText">🚀🐕</div></div></div>
+    <div id="title" class="overlay">
+      <div class="logo">BAGMAN</div>
+      <div class="tag">PICK YOUR WHALE.<br>CHASE YOUR BAG.</div>
+      <div class="edition">ELON EDITION</div>
+      <div class="cast" id="cast"></div>
+      <div class="blink" id="startHint">PRESS ENTER</div>
+      <div class="link" id="creditsLink">PHOTO CREDITS</div>
+    </div>
+    <div id="over" class="overlay hidden">
+      <div class="go-title">REKT</div>
+      <canvas class="go-face" id="goFace"></canvas>
+      <div class="go-killer" id="goKiller"></div>
+      <div class="go-small">BAG SECURED</div>
+      <div class="go-bag" id="goBag">Ð0</div>
+      <div class="go-small" id="goMeta"></div>
+      <div class="blink" id="retryHint">PRESS ENTER</div>
+    </div>
+    <div id="credits" class="overlay hidden">
+      <h2>PHOTO CREDITS</h2>
+      <ul>
+        <li>Elon Musk: Gage Skidmore, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a> (<a href="https://commons.wikimedia.org/wiki/File:Elon_Musk_-_54820081119_(cropped).jpg" target="_blank" rel="noopener">source</a>)</li>
+        <li>Mark Zuckerberg: Anthony Quintano, <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a> (<a href="https://commons.wikimedia.org/wiki/File:Mark_Zuckerberg_F8_2019_Keynote_(32830578717)_(cropped).jpg" target="_blank" rel="noopener">source</a>)</li>
+        <li>Bill Gates: Bogdan Hoyaux / © European Union 2026, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> (<a href="https://commons.wikimedia.org/wiki/File:Bill_Gates_at_the_European_Commission_-_P067383-987995_(cropped)_5.jpg" target="_blank" rel="noopener">source</a>)</li>
+        <li>Sam Altman: Office of the Prime Minister of Japan, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> (<a href="https://commons.wikimedia.org/wiki/File:Meeting_with_Masayoshi_Son_and_Sam_Altman_(February_3,_2025)_(3x4_cropped_on_Altman).jpg" target="_blank" rel="noopener">source</a>)</li>
+        <li>Jeff Bezos: U.S. Department of War, public domain (<a href="https://commons.wikimedia.org/wiki/File:260202-D-PM193-2205_SECWAR_Arsenal_of_Freedom_Tour_-_Florida_(3x4_cropped_on_Bezos_and_rotated).jpg" target="_blank" rel="noopener">source</a>)</li>
+      </ul>
+      <p>Photos cropped and animated. Parody game, not affiliated with or endorsed by anyone pictured.</p>
+      <button id="creditsBack">BACK</button>
+    </div>
+  </div>
+  <div id="foot">ARROWS / WASD · P PAUSE · M MUTE</div>
+</div>
+<script>
+'use strict';
+// ---------- maze ----------
+const T = 12;
+const MAZE = [
+  "#####################",
+  "#.........#.........#",
+  "#o###.###.#.###.###o#",
+  "#...................#",
+  "#.###.#.#####.#.###.#",
+  "#.....#...#...#.....#",
+  "#####.###.#.###.#####",
+  "#####.#.......#.#####",
+  "#####.#.##-##.#.#####",
+  "     .  #GGG#  .     ",
+  "#####.#.#####.#.#####",
+  "#####.#.......#.#####",
+  "#####.#.#####.#.#####",
+  "#.........#.........#",
+  "#.###.###.#.###.###.#",
+  "#o..#.....P.....#..o#",
+  "###.#.#.#####.#.#.###",
+  "#...#...#...#...#...#",
+  "#.#######.#.#######.#",
+  "#...................#",
+  "#####################"];
+const W = MAZE[0].length, H = MAZE.length, CW = W * T, CH = H * T;
+const HOUSE_DOOR = { x: 10, y: 7 }; // tile just above the door
+const tileAt = (x, y) => (y < 0 || y >= H) ? '#' : MAZE[y][((x % W) + W) % W];
+const open = (x, y) => !'#-G'.includes(tileAt(x, y));
+
+const UP = { x: 0, y: -1 }, DOWN = { x: 0, y: 1 }, LEFT = { x: -1, y: 0 }, RIGHT = { x: 1, y: 0 }, NONE = { x: 0, y: 0 };
+const DIR_LIST = [UP, LEFT, DOWN, RIGHT];
+const rev = d => d === UP ? DOWN : d === DOWN ? UP : d === LEFT ? RIGHT : d === RIGHT ? LEFT : NONE;
+
+// ---------- characters ----------
+// Face crop circles are in source-image pixels; `mouth` is the y of the lip line (the jaw hinge).
+const FACE_CFG = {
+  elon:   { src: 'faces/elon.jpg',   cx: 475, cy: 395, r: 335, mouth: 586, ring: '#f7c948', initials: 'EM' },
+  zuck:   { src: 'faces/zuck.jpg',   cx: 470, cy: 425, r: 375, mouth: 610, ring: '#ff4848', initials: 'MZ' },
+  gates:  { src: 'faces/gates.jpg',  cx: 485, cy: 365, r: 305, mouth: 517, ring: '#ff9bd2', initials: 'BG' },
+  altman: { src: 'faces/altman.jpg', cx: 190, cy: 178, r: 150, mouth: 258, ring: '#35e0ff', initials: 'SA' },
+  bezos:  { src: 'faces/bezos.jpg',  cx: 515, cy: 305, r: 250, mouth: 443, ring: '#ff9f1c', initials: 'JB', facesLeft: true },
+};
+const ENEMY_DEFS = [
+  { id: 'zuck',   name: 'ZUCKERBERG', desc: 'CAGE MATCH. CHASES YOU',      color: '#ff4848', scatter: { x: 19, y: -2 }, home: { x: 10, y: 7 }, release: 0,   eatMsg: 'TAPPED OUT',      killMsg: 'ZUCK' },
+  { id: 'gates',  name: 'BILL GATES', desc: 'SHORTED TESLA. CUTS YOU OFF', color: '#ff9bd2', scatter: { x: 1, y: -2 },  home: { x: 10, y: 9 }, release: 1.5, eatMsg: 'SHORT SQUEEZED',  killMsg: 'BILL GATES' },
+  { id: 'altman', name: 'SAM ALTMAN', desc: 'OPENAI FEUD. FLANKS YOU',     color: '#35e0ff', scatter: { x: 19, y: 22 }, home: { x: 9, y: 9 },  release: 5,   eatMsg: 'DEPRECATED',      killMsg: 'SAM ALTMAN' },
+  { id: 'bezos',  name: 'JEFF BEZOS', desc: 'SPACE RACE. CHARGES CLOSE',   color: '#ff9f1c', scatter: { x: 1, y: 22 },  home: { x: 11, y: 9 }, release: 9,   eatMsg: 'LAUNCH SCRUBBED', killMsg: 'BEZOS' }];
+const ELON_D = 22, ENEMY_D = 17;
+
+function canvasOf(w, h, fn) { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d')); return c; }
+function cloneCanvas(src) { return canvasOf(src.width, src.height, g => g.drawImage(src, 0, 0)); }
+function loadImage(src) { return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
+
+const FACE_RES = 160;
+const FACES = {};
+function makeDisc(img, cfg, tint) {
+  return canvasOf(FACE_RES, FACE_RES, g => {
+    const c = FACE_RES / 2, lw = FACE_RES * 0.06;
+    g.beginPath(); g.arc(c, c, c, 0, Math.PI * 2); g.clip();
+    if (img) {
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(img, cfg.cx - cfg.r, cfg.cy - cfg.r, cfg.r * 2, cfg.r * 2, 0, 0, FACE_RES, FACE_RES);
+    } else {
+      g.fillStyle = cfg.ring; g.fillRect(0, 0, FACE_RES, FACE_RES);
+      g.fillStyle = '#000'; g.font = 'bold 64px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(cfg.initials, c, c + 4);
+    }
+    g.lineWidth = lw; g.strokeStyle = cfg.ring; g.beginPath(); g.arc(c, c, c - lw / 2, 0, Math.PI * 2); g.stroke();
+    if (tint) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = tint; g.fillRect(0, 0, FACE_RES, FACE_RES); }
+  });
+}
+function splitDisc(disc, my) {
+  return {
+    full: disc, my,
+    top: canvasOf(FACE_RES, FACE_RES, g => g.drawImage(disc, 0, 0, FACE_RES, my, 0, 0, FACE_RES, my)),
+    bot: canvasOf(FACE_RES, FACE_RES - my, g => g.drawImage(disc, 0, my, FACE_RES, FACE_RES - my, 0, 0, FACE_RES, FACE_RES - my)),
+  };
+}
+function buildFace(id, img) {
+  const cfg = FACE_CFG[id];
+  const my = Math.round((cfg.mouth - (cfg.cy - cfg.r)) / (2 * cfg.r) * FACE_RES);
+  const mk = tint => splitDisc(makeDisc(img, cfg, tint), my);
+  FACES[id] = { normal: mk(null), fright: mk('rgba(34,51,255,0.62)'), flash: mk('rgba(255,255,255,0.78)') };
+}
+
+// Power-up: rocket (the Tweet), pixel art
+const ROCKET = [
+  "....r....",
+  "...rwr...",
+  "...wcw...",
+  "...www...",
+  "..wwwww..",
+  "..wwrww..",
+  ".rwwwwwr.",
+  ".r.www.r.",
+  "...yoy...",
+  "....y...."];
+const ROCKET_PAL = { r: '#ff3b3b', w: '#f4f4ff', c: '#35e0ff', y: '#ffd23f', o: '#ff8a00' };
+function makeRocket(flame) {
+  return canvasOf(9, 10, g => ROCKET.forEach((row, y) => { for (let x = 0; x < 9; x++) {
+    const ch = row[x]; if (ch === '.') continue; if (y >= 8 && !flame) continue;
+    g.fillStyle = ROCKET_PAL[ch]; g.fillRect(x, y, 1, 1);
+  } }));
+}
+
+// Maze render (neon double-line walls), drawn at maze resolution and scaled up crisp
+function makeMaze(color) {
+  return canvasOf(CW, CH, g => {
+    g.fillStyle = color;
+    const wall = (x, y) => (y < 0 || y >= H || x < 0 || x >= W) ? true : '#-'.includes(MAZE[y][x]);
+    const hl = (x, y, w) => g.fillRect(x, y, w, 1), vl = (x, y, h) => g.fillRect(x, y, 1, h);
+    const I = 3;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const c = MAZE[y][x];
+      if (c === '-') { g.fillStyle = '#ff9bd2'; g.fillRect(x * T, y * T + 5, T, 2); g.fillStyle = color; continue; }
+      if (c !== '#') continue;
+      const X = x * T, Y = y * T;
+      const t = !wall(x, y - 1), b = !wall(x, y + 1), l = !wall(x - 1, y), r = !wall(x + 1, y);
+      if (t) hl(X + (l ? I : 0), Y + I, T - (l ? I : 0) - (r ? I : 0));
+      if (b) hl(X + (l ? I : 0), Y + T - 1 - I, T - (l ? I : 0) - (r ? I : 0));
+      if (l) vl(X + I, Y + (t ? I : 0), T - (t ? I : 0) - (b ? I : 0));
+      if (r) vl(X + T - 1 - I, Y + (t ? I : 0), T - (t ? I : 0) - (b ? I : 0));
+      if (!t && !l && !wall(x - 1, y - 1)) { hl(X, Y + I, I + 1); vl(X + I, Y, I + 1); }
+      if (!t && !r && !wall(x + 1, y - 1)) { hl(X + T - 1 - I, Y + I, I + 1); vl(X + T - 1 - I, Y, I + 1); }
+      if (!b && !l && !wall(x - 1, y + 1)) { hl(X, Y + T - 1 - I, I + 1); vl(X + I, Y + T - 1 - I, I + 1); }
+      if (!b && !r && !wall(x + 1, y + 1)) { hl(X + T - 1 - I, Y + T - 1 - I, I + 1); vl(X + T - 1 - I, Y + T - 1 - I, I + 1); }
+    }
+  });
+}
+const ROCKET_SPR = [makeRocket(true), makeRocket(false)];
+const MAZE_BLUE = makeMaze('#3060ff'), MAZE_WHITE = makeMaze('#ffffff');
+
+// ---------- audio ----------
+let actx = null, muted = false, chompAlt = false;
+function ensureAudio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
+  if (actx && actx.state === 'suspended') actx.resume();
+}
+function tone(freq, dur, type = 'square', vol = 0.05, slideTo = null, when = 0) {
+  if (!actx || muted) return;
+  const t = actx.currentTime + when, o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
+}
+const SFX = {
+  chomp() { chompAlt = !chompAlt; tone(chompAlt ? 520 : 360, 0.06, 'square', 0.03, chompAlt ? 300 : 620); },
+  power() { tone(180, 0.55, 'sawtooth', 0.045, 1600); tone(360, 0.55, 'square', 0.025, 2400, 0.05); },
+  eat() { [600, 800, 1000, 1300].forEach((f, i) => tone(f, 0.08, 'square', 0.045, null, i * 0.05)); },
+  death() { tone(900, 1.3, 'triangle', 0.08, 60); tone(450, 1.3, 'square', 0.025, 40, 0.1); },
+  start() { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, 0.13, 'square', 0.04, null, i * 0.14)); },
+  clear() { [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.12, 'square', 0.04, null, i * 0.1)); },
+  extra() { [1047, 1319, 1568, 2093].forEach((f, i) => tone(f, 0.09, 'square', 0.04, null, i * 0.07)); },
+};
+
+// ---------- state ----------
+const cv = document.getElementById('game');
+const ctx = cv.getContext('2d');
+let R = 2; // canvas pixels per maze pixel
+
+const TWEETS = ['🚀🐕', 'Doge to the moon 🚀', 'much wow 🐕', 'funding secured 🚀', "the people's crypto 🐕", '🐕🐕🐕'];
+const SCHEDULE = [7, 20, 7, 20, 5, 20, 5]; // scatter/chase alternating, then chase forever
+
+let mode = 'title', paused = false, time = 0;
+let score = 0, hi = 0, lives = 3, level = 1, extraGiven = false;
+let coins = [], coinsLeft = 0;
+let player, ghosts = [];
+let globalMode = 'scatter', modeIdx = 0, modeT = 0, frightT = 0, combo = 0;
+let readyT = 0, dyingT = 0, clearT = 0, freezeT = 0, shakeT = 0, killer = null, restartAt = 0;
+let floats = [];
+
+try { hi = parseInt(localStorage.getItem('bagman_hi') || '0', 10) || 0; } catch (e) { hi = 0; }
+
+function resetCoins() {
+  coins = MAZE.map(r => [...r].map(c => c === '.' ? 1 : c === 'o' ? 2 : 0));
+  coinsLeft = coins.flat().filter(Boolean).length;
+}
+function lvlMul(base, perLvl, cap) { return Math.min(cap, 1 + perLvl * (level - 1)) * base; }
+function resetPositions() {
+  player = { x: 10, y: 15, dir: LEFT, next: LEFT, face: LEFT, anim: 0, tilt: 0 };
+  const rel = Math.max(0.4, 1 - 0.15 * (level - 1));
+  ghosts = ENEMY_DEFS.map((def, i) => ({
+    def, x: def.home.x, y: def.home.y, dir: i === 0 ? LEFT : NONE, face: LEFT,
+    state: i === 0 ? 'active' : 'house', timer: def.release * rel, frightened: false, phase: i * 1.7,
+  }));
+  globalMode = 'scatter'; modeIdx = 0; modeT = 0; frightT = 0; combo = 0; floats = [];
+}
+function startGame() {
+  ensureAudio();
+  score = 0; lives = 3; level = 1; extraGiven = false;
+  resetCoins(); resetPositions();
+  mode = 'ready'; readyT = 3.2; paused = false;
+  document.getElementById('title').classList.add('hidden');
+  document.getElementById('over').classList.add('hidden');
+  SFX.start(); updateHUD(true);
+}
+function nextLevel() {
+  level++; resetCoins(); resetPositions(); mode = 'ready'; readyT = 2; updateHUD(true);
+}
+function afterDeath() {
+  lives--; updateHUD(true);
+  if (lives <= 0) return gameOver();
+  resetPositions(); mode = 'ready'; readyT = 2;
+}
+function gameOver() {
+  mode = 'over'; restartAt = time + 0.9;
+  if (score > hi) { hi = score; try { localStorage.setItem('bagman_hi', String(hi)); } catch (e) {} }
+  const face = document.getElementById('goFace');
+  face.width = face.height = FACE_RES;
+  if (killer) face.getContext('2d').drawImage(FACES[killer.def.id].normal.full, 0, 0);
+  document.getElementById('goKiller').innerHTML = 'CAUGHT BY<br>' + (killer ? killer.def.killMsg : 'THE MARKET');
+  document.getElementById('goBag').textContent = 'Ð' + score.toLocaleString('en-US');
+  document.getElementById('goMeta').innerHTML = 'LEVEL ' + level + '<br>HI Ð' + hi.toLocaleString('en-US');
+  document.getElementById('over').classList.remove('hidden');
+  updateHUD(true);
+}
+
+// ---------- movement ----------
+const atCenter = e => Math.abs(e.x - Math.round(e.x)) < 1e-6 && Math.abs(e.y - Math.round(e.y)) < 1e-6;
+function wrapX(e) { if (e.x < -0.5) e.x += W; else if (e.x > W - 0.5) e.x -= W; }
+function moveGrid(e, dist, decide) {
+  let guard = 0;
+  while (dist > 1e-6 && guard++ < 12) {
+    if (atCenter(e)) {
+      e.x = Math.round(e.x); e.y = Math.round(e.y);
+      decide(e);
+      if (!e.dir.x && !e.dir.y) return;
+    }
+    let toNext;
+    if (e.dir.x) toNext = Math.abs((e.dir.x > 0 ? Math.floor(e.x + 1e-6) + 1 : Math.ceil(e.x - 1e-6) - 1) - e.x);
+    else toNext = Math.abs((e.dir.y > 0 ? Math.floor(e.y + 1e-6) + 1 : Math.ceil(e.y - 1e-6) - 1) - e.y);
+    const step = Math.min(dist, toNext);
+    e.x += e.dir.x * step; e.y += e.dir.y * step; dist -= step;
+    if (step === toNext) { e.x = Math.round(e.x); e.y = Math.round(e.y); }
+    wrapX(e);
+    if (e.dir.x) e.face = e.dir;
+  }
+}
+function decidePlayer(p) {
+  const cx = Math.round(p.x), cy = Math.round(p.y);
+  if (p.next !== NONE && open(cx + p.next.x, cy + p.next.y)) p.dir = p.next;
+  if (!open(cx + p.dir.x, cy + p.dir.y)) p.dir = NONE;
+  if (p.dir.x) p.face = p.dir;
+}
+function ghostTarget(g) {
+  if (g.state === 'eaten') return HOUSE_DOOR;
+  if (globalMode === 'scatter') return g.def.scatter;
+  const px = Math.round(player.x), py = Math.round(player.y);
+  const fd = (player.dir.x || player.dir.y) ? player.dir : player.face;
+  switch (g.def.id) {
+    case 'zuck': return { x: px, y: py };
+    case 'gates': return { x: px + fd.x * 4, y: py + fd.y * 4 };
+    case 'altman': {
+      const z = ghosts[0], ax = px + fd.x * 2, ay = py + fd.y * 2;
+      return { x: ax * 2 - Math.round(z.x), y: ay * 2 - Math.round(z.y) };
+    }
+    case 'bezos': return distTo(g, player) <= 8 ? { x: px, y: py } : g.def.scatter;
+  }
+  return { x: px, y: py };
+}
+function decideGhost(g) {
+  const cx = Math.round(g.x), cy = Math.round(g.y);
+  if (g.state === 'eaten' && cx === HOUSE_DOOR.x && cy === HOUSE_DOOR.y) { g.state = 'entering'; g.dir = NONE; return; }
+  let opts = DIR_LIST.filter(d => d !== rev(g.dir) && open(cx + d.x, cy + d.y));
+  if (!opts.length) opts = [rev(g.dir)];
+  if (g.frightened) { g.dir = opts[(Math.random() * opts.length) | 0]; return; }
+  const t = ghostTarget(g);
+  let best = opts[0], bd = Infinity;
+  for (const d of opts) { const dx = cx + d.x - t.x, dy = cy + d.y - t.y, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = d; } }
+  g.dir = best;
+}
+function distTo(a, b) { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, W - dx); return Math.hypot(dx, a.y - b.y); }
+function ghostSpeed(g) {
+  if (g.state === 'eaten') return 13;
+  if (g.state === 'house' || g.state === 'leaving' || g.state === 'entering') return 4;
+  if (Math.round(g.y) === 9 && (g.x < 5 || g.x > 15)) return 3.4;
+  if (g.frightened) return 3.6;
+  let s = lvlMul(6.0, 0.05, 1.3);
+  if (g.def.id === 'bezos' && globalMode === 'chase' && distTo(g, player) <= 8) s *= 1.15;
+  return s;
+}
+function updateGhost(g, dt) {
+  const sp = ghostSpeed(g) * dt;
+  if (g.state === 'house') {
+    g.timer -= dt; g.y = 9 + Math.sin(time * 6 + g.phase) * 0.25; g.dir = NONE;
+    if (g.timer <= 0) g.state = 'leaving';
+    return;
+  }
+  if (g.state === 'leaving') {
+    if (Math.abs(g.x - 10) > 1e-3) { g.dir = g.x < 10 ? RIGHT : LEFT; g.face = g.dir; g.x += Math.sign(10 - g.x) * Math.min(sp, Math.abs(10 - g.x)); }
+    else if (g.y > 7) { g.x = 10; g.dir = UP; g.y = Math.max(7, g.y - sp); }
+    if (Math.abs(g.x - 10) < 1e-3 && g.y <= 7) { g.x = 10; g.y = 7; g.state = 'active'; g.dir = LEFT; g.face = LEFT; }
+    return;
+  }
+  if (g.state === 'entering') {
+    g.x = 10; g.y = Math.min(9, g.y + sp);
+    if (g.y >= 9) { g.state = 'leaving'; g.frightened = false; }
+    return;
+  }
+  moveGrid(g, sp, decideGhost);
+}
+
+function addFloat(x, y, text, color, life = 1) { floats.push({ x, y, text, color, life, t: 0 }); }
+
+function step(h) {
+  // mode timers
+  if (frightT > 0) {
+    frightT -= h;
+    if (frightT <= 0) ghosts.forEach(g => g.frightened = false);
+  } else if (modeIdx < SCHEDULE.length) {
+    modeT += h;
+    if (modeT >= SCHEDULE[modeIdx]) {
+      modeT = 0; modeIdx++;
+      globalMode = modeIdx >= SCHEDULE.length || modeIdx % 2 === 1 ? 'chase' : 'scatter';
+      ghosts.forEach(g => { if (g.state === 'active') g.dir = rev(g.dir); });
+    }
+  }
+  // player
+  const before = { x: player.x, y: player.y };
+  moveGrid(player, lvlMul(6.6, 0.03, 1.2) * h, decidePlayer);
+  if (player.dir === NONE) decidePlayer(player);
+  let moved = Math.abs(player.x - before.x); if (moved > 1) moved = 0; moved += Math.abs(player.y - before.y);
+  player.anim += moved * 3;
+  const tx = ((Math.round(player.x) % W) + W) % W, ty = Math.round(player.y);
+  const c = coins[ty] && coins[ty][tx];
+  if (c) {
+    coins[ty][tx] = 0; coinsLeft--;
+    if (c === 1) { addScore(10); SFX.chomp(); }
+    else powerUp();
+    if (coinsLeft <= 0) { mode = 'clear'; clearT = 0; SFX.clear(); return; }
+  }
+  // ghosts
+  for (const g of ghosts) updateGhost(g, h);
+  // collisions
+  for (const g of ghosts) {
+    if (g.state !== 'active' && g.state !== 'leaving') continue;
+    if (distTo(g, player) > 0.7) continue;
+    if (g.frightened) {
+      const pts = 200 * Math.pow(2, combo); combo = Math.min(combo + 1, 3);
+      addScore(pts); g.state = 'eaten'; g.frightened = false;
+      addFloat(g.x, g.y - 0.6, g.def.eatMsg, '#fff', 1.1);
+      addFloat(g.x, g.y + 0.5, '+' + pts, '#35e0ff', 1.1);
+      freezeT = 0.5; shakeT = 0.15; SFX.eat();
+      return;
+    }
+    killer = g; mode = 'dying'; dyingT = 0; shakeT = 0.35; SFX.death();
+    return;
+  }
+}
+function powerUp() {
+  addScore(50); combo = 0;
+  frightT = Math.max(2, 7 - (level - 1));
+  ghosts.forEach(g => {
+    if (g.state === 'eaten' || g.state === 'entering') return;
+    g.frightened = true;
+    if (g.state === 'active') g.dir = rev(g.dir);
+  });
+  shakeT = 0.3; SFX.power();
+  const pump = document.getElementById('pump');
+  pump.classList.remove('go'); void pump.offsetWidth; pump.classList.add('go');
+  showTweet();
+}
+let tweetTimer = null;
+function showTweet() {
+  const el = document.getElementById('tweet');
+  document.getElementById('tweetText').textContent = TWEETS[(Math.random() * TWEETS.length) | 0];
+  el.classList.add('show');
+  clearTimeout(tweetTimer);
+  tweetTimer = setTimeout(() => el.classList.remove('show'), 1700);
+}
+function addScore(n) {
+  score += n;
+  if (!extraGiven && score >= 10000) {
+    extraGiven = true; lives++; SFX.extra();
+    addFloat(player.x, player.y - 1, 'EXTRA LIFE', '#f7c948', 1.5);
+  }
+  updateHUD();
+}
+
+// ---------- loop ----------
+function update(dt) {
+  shakeT = Math.max(0, shakeT - dt);
+  floats.forEach(f => f.t += dt); floats = floats.filter(f => f.t < f.life);
+  if (paused) return;
+  if (player) player.tilt += (player.dir.x * 0.12 - player.tilt) * Math.min(1, dt * 10);
+  switch (mode) {
+    case 'ready': readyT -= dt; if (readyT <= 0) mode = 'play'; break;
+    case 'play': {
+      if (freezeT > 0) { freezeT -= dt; break; }
+      const n = Math.ceil(dt / (1 / 120)), h = dt / n;
+      for (let i = 0; i < n && mode === 'play' && freezeT <= 0; i++) step(h);
+      break;
+    }
+    case 'dying': dyingT += dt; if (dyingT >= 2.2) afterDeath(); break;
+    case 'clear': clearT += dt; if (clearT >= 2.2) nextLevel(); break;
+  }
+}
+
+const cxOf = v => (v + 0.5) * T;
+function drawCoin(x, y) {
+  const cx = x * T + 4, cy = y * T + 4;
+  ctx.fillStyle = '#f7c948'; ctx.fillRect(cx + 1, cy, 2, 1); ctx.fillRect(cx, cy + 1, 4, 2); ctx.fillRect(cx + 1, cy + 3, 2, 1);
+  ctx.fillStyle = '#fff3b0'; ctx.fillRect(cx + 1, cy + 1, 1, 1);
+  ctx.fillStyle = '#c9961a'; ctx.fillRect(cx + 3, cy + 2, 1, 1); ctx.fillRect(cx + 2, cy + 3, 1, 1);
+}
+// A face disc with a puppet jaw: the chin drops by `open` (0..1) to reveal a mouth.
+function drawFace(set, x, y, D, open, opts = {}) {
+  const k = D / FACE_RES, myD = set.my * k, drop = open * D * 0.22;
+  ctx.save();
+  ctx.translate(x, y);
+  if (opts.rot) ctx.rotate(opts.rot);
+  if (opts.flip) ctx.scale(-1, 1);
+  if (opts.alpha != null) ctx.globalAlpha = opts.alpha;
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  if (drop > 0.05) {
+    // mouth interior, clipped to the head outline stretched by the dropped jaw
+    const yM = -D / 2 + myD, half = Math.sqrt(Math.max(0, (D / 2) ** 2 - yM ** 2));
+    ctx.save();
+    ctx.beginPath(); ctx.arc(0, 0, D / 2, 0, Math.PI * 2); ctx.arc(0, drop, D / 2, 0, Math.PI * 2); ctx.clip();
+    ctx.fillStyle = '#2a0408'; ctx.fillRect(-half, yM - 0.5, half * 2, drop + 1);
+    ctx.fillStyle = '#c23a50'; ctx.beginPath(); ctx.ellipse(0, yM + drop, half * 0.45, drop * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f4f1ea'; ctx.fillRect(-half * 0.5, yM - 0.2, half, Math.min(1.1, drop * 0.25));
+    ctx.restore();
+  }
+  ctx.drawImage(set.top, -D / 2, -D / 2, D, D);
+  ctx.drawImage(set.bot, -D / 2, -D / 2 + myD + drop, D, (FACE_RES - set.my) * k);
+  ctx.restore();
+}
+function drawGhostBody(x, y, color) {
+  const r = 10, top = y - 3, bottom = y + 10, n = 6, ph = Math.floor(time * 8) % 2;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x - r, top);
+  ctx.arc(x, top, r, Math.PI, 0);
+  ctx.lineTo(x + r, bottom);
+  for (let i = 1; i <= n; i++) ctx.lineTo(x + r - (2 * r) * i / n, (i + ph) % 2 ? bottom - 2.5 : bottom);
+  ctx.closePath(); ctx.fill();
+}
+function drawEnemy(g) {
+  const F = FACES[g.def.id], x = cxOf(g.x), y = cxOf(g.y);
+  const flip = FACE_CFG[g.def.id].facesLeft ? g.face === RIGHT : g.face === LEFT;
+  if (g.state === 'eaten' || g.state === 'entering') { drawFace(F.normal, x, y, 11, 0, { alpha: 0.5, flip }); return; }
+  let set = F.normal, body = g.def.color, jx = 0;
+  if (g.frightened) {
+    const flash = frightT < 2 && Math.floor(frightT * 5) % 2 === 0;
+    set = flash ? F.flash : F.fright; body = flash ? '#f4f4ff' : '#2233ff';
+    jx = Math.sin(time * 40 + g.phase) * 0.6;
+  }
+  drawGhostBody(x + jx, y, body);
+  drawFace(set, x + jx, y - 3, ENEMY_D, 0, { flip });
+}
+function label(text, row, color) {
+  ctx.font = '8px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(text).width + 6, y = cxOf(row);
+  ctx.fillStyle = '#000'; ctx.fillRect(Math.round(CW / 2 - w / 2), y - 6, Math.round(w), 12);
+  ctx.fillStyle = color; ctx.fillText(text, CW / 2, y + 1);
+}
+function render() {
+  ctx.setTransform(R, 0, 0, R, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
+  if (shakeT > 0) { const m = Math.ceil(shakeT * 8); ctx.translate(Math.round((Math.random() * 2 - 1) * m), Math.round((Math.random() * 2 - 1) * m)); }
+  const flash = mode === 'clear' && Math.floor(clearT * 5) % 2 === 1;
+  ctx.drawImage(flash ? MAZE_WHITE : MAZE_BLUE, 0, 0);
+  const blinkOn = mode !== 'play' || Math.floor(time * 4) % 2 === 0;
+  const rocket = ROCKET_SPR[Math.floor(time * 10) % 2];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (coins[y][x] === 1) drawCoin(x, y);
+    else if (coins[y][x] === 2 && blinkOn) ctx.drawImage(rocket, x * T + 1, y * T + 1);
+  }
+  const hideGhosts = (mode === 'dying' && dyingT > 0.6) || mode === 'clear';
+  if (!hideGhosts) {
+    // returning (eaten) rivals first so live ones draw on top
+    for (const g of ghosts) if (g.state === 'eaten' || g.state === 'entering') drawEnemy(g);
+    for (const g of ghosts) if (g.state !== 'eaten' && g.state !== 'entering') drawEnemy(g);
+  }
+  // player
+  const px = cxOf(player.x), py = cxOf(player.y), flip = player.face === LEFT;
+  if (mode === 'dying' && dyingT > 0.6) {
+    const t = (dyingT - 0.6) / 1.1;
+    if (t < 1) drawFace(FACES.elon.normal, px, py, ELON_D * (1 - t), 1, { flip, rot: t * Math.PI * 3 });
+  } else {
+    const chomping = mode === 'play' && player.dir !== NONE;
+    const openA = chomping ? 0.5 - 0.5 * Math.cos(player.anim * 1.6) : (mode === 'play' ? 0.35 : 0);
+    drawFace(FACES.elon.normal, px, py, ELON_D, openA, { flip, rot: player.tilt });
+  }
+  // floats
+  ctx.font = '8px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const f of floats) {
+    const w = ctx.measureText(f.text).width;
+    const x = Math.min(CW - w / 2 - 2, Math.max(w / 2 + 2, cxOf(f.x)));
+    ctx.fillStyle = '#000'; ctx.fillText(f.text, x + 1, cxOf(f.y) - f.t * 8 + 1);
+    ctx.fillStyle = f.color; ctx.fillText(f.text, x, cxOf(f.y) - f.t * 8);
+  }
+  ctx.setTransform(R, 0, 0, R, 0, 0);
+  if (mode === 'ready') label(level > 1 && readyT > 1.2 ? 'LEVEL ' + level : 'READY!', 11, '#f7c948');
+  if (mode === 'dying' && dyingT > 0.6 && killer) label('REKT BY ' + killer.def.killMsg, 11, '#ff4848');
+  if (mode === 'clear') label('TO THE MOON!', 11, '#f7c948');
+  if (paused) label('PAUSED', 11, '#fff');
+}
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
+  update(dt); render();
+  requestAnimationFrame(frame);
+}
+
+// ---------- HUD / layout ----------
+let hudCache = '';
+function updateHUD(force) {
+  const key = score + '|' + hi + '|' + level + '|' + lives;
+  if (key === hudCache && !force) return;
+  hudCache = key;
+  document.getElementById('score').textContent = 'Ð' + score.toLocaleString('en-US');
+  document.getElementById('hi').textContent = 'Ð' + Math.max(hi, score).toLocaleString('en-US');
+  document.getElementById('lvl').textContent = level;
+  const lv = document.getElementById('lives'); lv.innerHTML = '';
+  const n = mode === 'title' ? 2 : Math.max(0, lives - 1);
+  for (let i = 0; i < n; i++) lv.appendChild(cloneCanvas(FACES.elon.normal.full));
+}
+function fit() {
+  const availW = window.innerWidth - 32, availH = window.innerHeight - 32 - 30;
+  let s = Math.min(availW / CW, availH / (CH + 26));
+  if (s >= 3) s = Math.floor(s); else if (s >= 2) s = Math.floor(s * 2) / 2;
+  s = Math.max(0.8, s);
+  R = Math.max(1, Math.round(s * (window.devicePixelRatio || 1)));
+  cv.width = CW * R; cv.height = CH * R;
+  document.documentElement.style.setProperty('--s', s);
+  cv.style.width = CW * s + 'px'; cv.style.height = CH * s + 'px';
+  document.getElementById('hud').style.width = CW * s + 'px';
+}
+
+// ---------- input ----------
+const KEYMAP = { ArrowUp: UP, KeyW: UP, ArrowDown: DOWN, KeyS: DOWN, ArrowLeft: LEFT, KeyA: LEFT, ArrowRight: RIGHT, KeyD: RIGHT };
+function setDir(d) {
+  if (!player) return;
+  player.next = d;
+  if (player.dir !== NONE && d === rev(player.dir)) { player.dir = d; if (d.x) player.face = d; }
+}
+const creditsOpen = () => !document.getElementById('credits').classList.contains('hidden');
+function tryStart() {
+  if (creditsOpen()) return;
+  if (mode === 'title') startGame();
+  else if (mode === 'over' && time >= restartAt) startGame();
+}
+function togglePause() { if (mode === 'play' || mode === 'ready') paused = !paused; }
+window.addEventListener('keydown', e => {
+  if (KEYMAP[e.code]) { e.preventDefault(); setDir(KEYMAP[e.code]); return; }
+  if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); tryStart(); }
+  else if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
+  else if (e.code === 'KeyM') muted = !muted;
+});
+document.getElementById('title').addEventListener('pointerdown', tryStart);
+document.getElementById('over').addEventListener('pointerdown', tryStart);
+document.getElementById('creditsLink').addEventListener('pointerdown', e => {
+  e.stopPropagation(); document.getElementById('credits').classList.remove('hidden');
+});
+document.getElementById('creditsBack').addEventListener('click', () => document.getElementById('credits').classList.add('hidden'));
+let touch = null;
+window.addEventListener('touchstart', e => { const t = e.changedTouches[0]; touch = { x: t.clientX, y: t.clientY }; ensureAudio(); }, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (creditsOpen()) return;
+  e.preventDefault();
+  if (!touch) return;
+  const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+  if (Math.hypot(dx, dy) > 16) {
+    setDir(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? RIGHT : LEFT) : (dy > 0 ? DOWN : UP));
+    touch = { x: t.clientX, y: t.clientY };
+  }
+}, { passive: false });
+window.addEventListener('touchend', () => { touch = null; });
+document.addEventListener('visibilitychange', () => { if (document.hidden && (mode === 'play' || mode === 'ready')) paused = true; });
+window.addEventListener('resize', fit);
+
+// ---------- boot ----------
+(async function boot() {
+  const ids = Object.keys(FACE_CFG);
+  const imgs = await Promise.all(ids.map(id => loadImage(FACE_CFG[id].src)));
+  ids.forEach((id, i) => buildFace(id, imgs[i]));
+
+  if (matchMedia('(pointer: coarse)').matches) {
+    document.getElementById('startHint').textContent = 'TAP TO START';
+    document.getElementById('retryHint').textContent = 'TAP TO RETRY';
+    document.getElementById('foot').textContent = 'SWIPE TO MOVE';
+  }
+  const cast = document.getElementById('cast');
+  const rows = [['elon', 'ELON', 'EATS DOGE', '#f7c948']].concat(ENEMY_DEFS.map(d => [d.id, d.name, d.desc, d.color]));
+  for (const [id, n, d, col] of rows) {
+    const txt = document.createElement('div');
+    txt.innerHTML = '<div class="n" style="color:' + col + '">' + n + '</div><div class="d">' + d + '</div>';
+    cast.append(cloneCanvas(FACES[id].normal.full), txt);
+  }
+  const av = document.getElementById('avatar');
+  av.width = av.height = FACE_RES;
+  av.getContext('2d').drawImage(FACES.elon.normal.full, 0, 0);
+
+  resetCoins(); resetPositions(); fit(); updateHUD(true);
+  const go = () => requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+  if (document.fonts && document.fonts.load) {
+    Promise.race([document.fonts.load('8px "Press Start 2P"'), new Promise(r => setTimeout(r, 1500))]).then(go, go);
+  } else go();
+})();
+</script>
+</body>
+</html>
