@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "bagman",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8642", "--bind", "127.0.0.1"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 8642
     }
   ]

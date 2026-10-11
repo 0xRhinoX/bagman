@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bagman",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  // The game itself: plain static files. Requests that don't match a file (like /api/*) go to the worker.
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bagman",
+      // Placeholder for local dev. Replace with the id printed by `npx wrangler d1 create bagman` before deploying.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

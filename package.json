@@ -1,0 +1,13 @@
+{
+  "name": "bagman",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler d1 migrations apply bagman --local && wrangler dev --port 8642 --ip 127.0.0.1",
+    "db:remote": "wrangler d1 migrations apply bagman --remote",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.149.0"
+  }
+}

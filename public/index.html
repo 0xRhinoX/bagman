@@ -34,11 +34,40 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
 .blink{font-size:calc(var(--s)*7px);animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 .link{font-size:calc(var(--s)*5px);color:var(--dim);text-decoration:underline;cursor:pointer}
-.go-title{font-size:calc(var(--s)*16px);color:#ff3b3b;text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 #600}
-.go-face{width:calc(var(--s)*48px);height:calc(var(--s)*48px)}
-.go-killer{font-size:calc(var(--s)*7px);line-height:1.7}
-.go-bag{font-size:calc(var(--s)*14px);color:var(--gold)}
+#over{gap:calc(var(--s)*4px)}
+.go-title{font-size:calc(var(--s)*14px);color:#ff3b3b;text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 #600}
+.go-row{display:flex;align-items:center;gap:calc(var(--s)*6px);text-align:left}
+.go-face{width:calc(var(--s)*30px);height:calc(var(--s)*30px)}
+.go-killer{font-size:calc(var(--s)*6px);line-height:1.7}
+.go-bag{font-size:calc(var(--s)*12px);color:var(--gold)}
 .go-small{font-size:calc(var(--s)*6px);color:var(--dim);line-height:1.8}
+.links{display:flex;gap:calc(var(--s)*10px)}
+.btn{font-family:inherit;font-size:calc(var(--s)*6px);background:var(--gold);color:#000;border:0;padding:calc(var(--s)*3px) calc(var(--s)*6px);cursor:pointer}
+.name-row{display:flex;gap:calc(var(--s)*3px);align-items:stretch}
+.name-row input{font-family:inherit;font-size:max(16px,calc(var(--s)*7px));width:calc(var(--s)*100px);background:#000;color:var(--gold);border:1px solid var(--gold);border-radius:0;padding:calc(var(--s)*2px) calc(var(--s)*3px);text-transform:uppercase;outline:none;-webkit-user-select:text;user-select:text}
+.name-row input::placeholder{color:#6b5a1e}
+.rank-line{font-size:calc(var(--s)*6px);color:var(--cyan);line-height:1.6;min-height:1.6em}
+.rows{width:calc(var(--s)*176px);font-size:calc(var(--s)*6px);line-height:1.9;text-align:left}
+.rows .head{color:var(--pink);font-size:calc(var(--s)*5px)}
+.rows .row{display:grid;grid-template-columns:calc(var(--s)*24px) 1fr auto;gap:calc(var(--s)*4px)}
+.rows .row.me{color:var(--gold)}
+.rows .empty{color:var(--dim);text-align:center}
+#board{cursor:default}
+#board,#credits{background:rgba(0,0,0,.96)}
+#board h2{font-size:calc(var(--s)*9px);color:var(--gold);font-weight:400}
+.tabs{display:flex;gap:calc(var(--s)*3px)}
+.tabs .btn{background:#222;color:#fff}
+.tabs .btn.on{background:var(--gold);color:#000}
+.no-lb .lb{display:none!important}
+#win{background:rgba(0,0,0,.25);justify-content:flex-end;padding-bottom:calc(var(--s)*14px);gap:calc(var(--s)*5px)}
+.win-sub{font-size:calc(var(--s)*7px);color:#fff;text-shadow:0 0 calc(var(--s)*3px) #000}
+.win-title{font-size:calc(var(--s)*20px);line-height:1.25;color:var(--gold);text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 var(--pink),0 0 calc(var(--s)*6px) #000}
+.win-stats{display:grid;grid-template-columns:auto auto;gap:calc(var(--s)*2px) calc(var(--s)*8px);font-size:calc(var(--s)*6px);background:rgba(0,0,0,.7);padding:calc(var(--s)*4px) calc(var(--s)*7px);text-align:left}
+.win-stats span{color:var(--dim)}
+.win-stats b{font-weight:400;color:#fff;text-align:right}
+.win-rekt{display:flex;gap:calc(var(--s)*4px);align-items:flex-end}
+.win-rekt div{display:flex;flex-direction:column;align-items:center;gap:calc(var(--s)*1px);font-size:calc(var(--s)*4px);color:#7f8cff}
+.win-rekt canvas{width:calc(var(--s)*16px);height:calc(var(--s)*16px)}
 #credits{cursor:default;padding:calc(var(--s)*10px)}
 #credits h2{font-size:calc(var(--s)*8px);color:var(--gold);font-weight:400}
 #credits ul{list-style:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:calc(var(--s)*5.5px);line-height:1.55;color:#d5d9ea;text-align:left}
@@ -74,16 +103,36 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
       <div class="edition">ELON EDITION</div>
       <div class="cast" id="cast"></div>
       <div class="blink" id="startHint">PRESS ENTER</div>
-      <div class="link" id="creditsLink">PHOTO CREDITS</div>
+      <div class="links"><span class="link lb" id="boardLink">LEADERBOARD</span><span class="link" id="creditsLink">PHOTO CREDITS</span></div>
     </div>
     <div id="over" class="overlay hidden">
       <div class="go-title">REKT</div>
-      <canvas class="go-face" id="goFace"></canvas>
-      <div class="go-killer" id="goKiller"></div>
-      <div class="go-small">BAG SECURED</div>
+      <div class="go-row"><canvas class="go-face" id="goFace"></canvas><div class="go-killer" id="goKiller"></div></div>
       <div class="go-bag" id="goBag">Ð0</div>
       <div class="go-small" id="goMeta"></div>
+      <div class="name-row lb" id="nameRow"><input id="nameInput" maxlength="12" placeholder="YOUR NAME" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done"><button class="btn" id="nameSave">SAVE</button></div>
+      <div class="rank-line lb" id="rankLine"></div>
+      <div class="rows lb" id="goBoard"></div>
       <div class="blink" id="retryHint">PRESS ENTER</div>
+    </div>
+    <div id="win" class="overlay hidden">
+      <div class="win-sub" id="winLevel">LEVEL 1 CLEARED</div>
+      <div class="win-title">TO THE<br>MOON!</div>
+      <div class="win-stats">
+        <span>BAG</span><b id="winBag">Ð0</b>
+        <span>TIME</span><b id="winTime">0:00</b>
+        <span>RIVALS EATEN</span><b id="winEaten">0</b>
+      </div>
+      <div class="rank-line lb" id="winRank"></div>
+      <div class="win-rekt" id="winRekt"></div>
+      <div class="blink" id="nextHint">PRESS ENTER FOR LEVEL 2</div>
+    </div>
+    <div id="board" class="overlay hidden">
+      <h2>LEADERBOARD</h2>
+      <div class="tabs"><button class="btn on" data-board="today">TODAY</button><button class="btn" data-board="all">ALL TIME</button></div>
+      <div class="rows" id="boardRows"></div>
+      <div class="go-small" id="boardNote"></div>
+      <button class="btn" id="boardBack">BACK</button>
     </div>
     <div id="credits" class="overlay hidden">
       <h2>PHOTO CREDITS</h2>
@@ -136,19 +185,21 @@ const DIR_LIST = [UP, LEFT, DOWN, RIGHT];
 const rev = d => d === UP ? DOWN : d === DOWN ? UP : d === LEFT ? RIGHT : d === RIGHT ? LEFT : NONE;
 
 // ---------- characters ----------
-// Face crop circles are in source-image pixels; `mouth` is the y of the lip line (the jaw hinge).
+// Faces are pre-cropped 320x320 squares (originals in source/faces-original).
+// `mouth` is the y of the lip line in that square: the jaw hinge.
 const FACE_CFG = {
-  elon:   { src: 'faces/elon.jpg',   cx: 475, cy: 395, r: 335, mouth: 586, ring: '#f7c948', initials: 'EM' },
-  zuck:   { src: 'faces/zuck.jpg',   cx: 470, cy: 425, r: 375, mouth: 610, ring: '#ff4848', initials: 'MZ' },
-  gates:  { src: 'faces/gates.jpg',  cx: 485, cy: 365, r: 305, mouth: 517, ring: '#ff9bd2', initials: 'BG' },
-  altman: { src: 'faces/altman.jpg', cx: 190, cy: 178, r: 150, mouth: 258, ring: '#35e0ff', initials: 'SA' },
-  bezos:  { src: 'faces/bezos.jpg',  cx: 515, cy: 305, r: 250, mouth: 443, ring: '#ff9f1c', initials: 'JB', facesLeft: true },
+  elon:   { src: 'faces/elon.jpg',   mouth: 251, ring: '#f7c948', initials: 'EM' },
+  zuck:   { src: 'faces/zuck.jpg',   mouth: 239, ring: '#ff4848', initials: 'MZ' },
+  gates:  { src: 'faces/gates.jpg',  mouth: 240, ring: '#ff9bd2', initials: 'BG' },
+  altman: { src: 'faces/altman.jpg', mouth: 245, ring: '#35e0ff', initials: 'SA' },
+  bezos:  { src: 'faces/bezos.jpg',  mouth: 248, ring: '#ff9f1c', initials: 'JB', facesLeft: true },
 };
+const FACE_SRC_SIZE = 320;
 const ENEMY_DEFS = [
   { id: 'zuck',   name: 'ZUCKERBERG', desc: 'CAGE MATCH. CHASES YOU',      color: '#ff4848', scatter: { x: 19, y: -2 }, home: { x: 10, y: 7 }, release: 0,   eatMsg: 'TAPPED OUT',      killMsg: 'ZUCK' },
-  { id: 'gates',  name: 'BILL GATES', desc: 'SHORTED TESLA. CUTS YOU OFF', color: '#ff9bd2', scatter: { x: 1, y: -2 },  home: { x: 10, y: 9 }, release: 1.5, eatMsg: 'SHORT SQUEEZED',  killMsg: 'BILL GATES' },
-  { id: 'altman', name: 'SAM ALTMAN', desc: 'OPENAI FEUD. FLANKS YOU',     color: '#35e0ff', scatter: { x: 19, y: 22 }, home: { x: 9, y: 9 },  release: 5,   eatMsg: 'DEPRECATED',      killMsg: 'SAM ALTMAN' },
-  { id: 'bezos',  name: 'JEFF BEZOS', desc: 'SPACE RACE. CHARGES CLOSE',   color: '#ff9f1c', scatter: { x: 1, y: 22 },  home: { x: 11, y: 9 }, release: 9,   eatMsg: 'LAUNCH SCRUBBED', killMsg: 'BEZOS' }];
+  { id: 'gates',  name: 'BILL GATES', desc: 'SHORTED TESLA. CUTS YOU OFF', color: '#ff9bd2', scatter: { x: 1, y: -2 },  home: { x: 10, y: 9 }, release: 3,   eatMsg: 'SHORT SQUEEZED',  killMsg: 'BILL GATES' },
+  { id: 'altman', name: 'SAM ALTMAN', desc: 'OPENAI FEUD. FLANKS YOU',     color: '#35e0ff', scatter: { x: 19, y: 22 }, home: { x: 9, y: 9 },  release: 10,  eatMsg: 'DEPRECATED',      killMsg: 'SAM ALTMAN' },
+  { id: 'bezos',  name: 'JEFF BEZOS', desc: 'SPACE RACE. CHARGES CLOSE',   color: '#ff9f1c', scatter: { x: 1, y: 22 },  home: { x: 11, y: 9 }, release: 18,  eatMsg: 'LAUNCH SCRUBBED', killMsg: 'BEZOS' }];
 const ELON_D = 22, ENEMY_D = 17;
 
 function canvasOf(w, h, fn) { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d')); return c; }
@@ -163,7 +214,7 @@ function makeDisc(img, cfg, tint) {
     g.beginPath(); g.arc(c, c, c, 0, Math.PI * 2); g.clip();
     if (img) {
       g.imageSmoothingQuality = 'high';
-      g.drawImage(img, cfg.cx - cfg.r, cfg.cy - cfg.r, cfg.r * 2, cfg.r * 2, 0, 0, FACE_RES, FACE_RES);
+      g.drawImage(img, 0, 0, FACE_SRC_SIZE, FACE_SRC_SIZE, 0, 0, FACE_RES, FACE_RES);
     } else {
       g.fillStyle = cfg.ring; g.fillRect(0, 0, FACE_RES, FACE_RES);
       g.fillStyle = '#000'; g.font = 'bold 64px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -182,7 +233,7 @@ function splitDisc(disc, my) {
 }
 function buildFace(id, img) {
   const cfg = FACE_CFG[id];
-  const my = Math.round((cfg.mouth - (cfg.cy - cfg.r)) / (2 * cfg.r) * FACE_RES);
+  const my = Math.round(cfg.mouth / FACE_SRC_SIZE * FACE_RES);
   const mk = tint => splitDisc(makeDisc(img, cfg, tint), my);
   FACES[id] = { normal: mk(null), fright: mk('rgba(34,51,255,0.62)'), flash: mk('rgba(255,255,255,0.78)') };
 }
@@ -256,6 +307,11 @@ const SFX = {
   start() { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, 0.13, 'square', 0.04, null, i * 0.14)); },
   clear() { [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.12, 'square', 0.04, null, i * 0.1)); },
   extra() { [1047, 1319, 1568, 2093].forEach((f, i) => tone(f, 0.09, 'square', 0.04, null, i * 0.07)); },
+  win() {
+    [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.36], [784, 0.6], [1047, 0.72], [1319, 0.84], [1568, 1.0]]
+      .forEach(([f, w], i) => tone(f, i === 7 ? 0.6 : 0.14, 'square', 0.045, null, w));
+    tone(130, 1.4, 'triangle', 0.05, 520, 0);
+  },
 };
 
 // ---------- state ----------
@@ -264,15 +320,24 @@ const ctx = cv.getContext('2d');
 let R = 2; // canvas pixels per maze pixel
 
 const TWEETS = ['🚀🐕', 'Doge to the moon 🚀', 'much wow 🐕', 'funding secured 🚀', "the people's crypto 🐕", '🐕🐕🐕'];
-const SCHEDULE = [7, 20, 7, 20, 5, 20, 5]; // scatter/chase alternating, then chase forever
+
+// Difficulty is tuned to be easy: rivals are much slower than Elon on level 1,
+// sometimes take a random turn, and both gaps narrow a little every level.
+const START_LIVES = 5;
+const SCHEDULE = [9, 12, 9, 12, 7, 15, 7]; // scatter/chase alternating, then chase forever
+const PLAYER_SPEED = 7.0, RIVAL_SPEED = 4.8, HIT_RADIUS = 0.55;
+const wanderChance = () => Math.max(0.05, 0.3 - 0.05 * (level - 1));
+const frightSeconds = () => Math.max(4, 10 - (level - 1));
 
 let mode = 'title', paused = false, time = 0;
-let score = 0, hi = 0, lives = 3, level = 1, extraGiven = false;
+let score = 0, hi = 0, lives = START_LIVES, level = 1, extraGiven = false;
 let coins = [], coinsLeft = 0;
 let player, ghosts = [];
 let globalMode = 'scatter', modeIdx = 0, modeT = 0, frightT = 0, combo = 0;
-let readyT = 0, dyingT = 0, clearT = 0, freezeT = 0, shakeT = 0, killer = null, restartAt = 0;
-let floats = [];
+let readyT = 0, dyingT = 0, clearT = 0, winT = 0, freezeT = 0, shakeT = 0, killer = null, restartAt = 0;
+let floats = [], levelStats = { time: 0, eaten: 0 }, runTime = 0;
+let confetti = [];
+const STARS = Array.from({ length: 70 }, () => ({ x: Math.random() * CW, y: Math.random() * CH, r: Math.random() < 0.2 ? 2 : 1, tw: 1 + Math.random() * 3, ph: Math.random() * 6 }));
 
 try { hi = parseInt(localStorage.getItem('bagman_hi') || '0', 10) || 0; } catch (e) { hi = 0; }
 
@@ -283,7 +348,7 @@ function resetCoins() {
 function lvlMul(base, perLvl, cap) { return Math.min(cap, 1 + perLvl * (level - 1)) * base; }
 function resetPositions() {
   player = { x: 10, y: 15, dir: LEFT, next: LEFT, face: LEFT, anim: 0, tilt: 0 };
-  const rel = Math.max(0.4, 1 - 0.15 * (level - 1));
+  const rel = Math.max(0.4, 1 - 0.1 * (level - 1));
   ghosts = ENEMY_DEFS.map((def, i) => ({
     def, x: def.home.x, y: def.home.y, dir: i === 0 ? LEFT : NONE, face: LEFT,
     state: i === 0 ? 'active' : 'house', timer: def.release * rel, frightened: false, phase: i * 1.7,
@@ -292,15 +357,36 @@ function resetPositions() {
 }
 function startGame() {
   ensureAudio();
-  score = 0; lives = 3; level = 1; extraGiven = false;
-  resetCoins(); resetPositions();
+  score = 0; lives = START_LIVES; level = 1; extraGiven = false; runTime = 0;
+  resetCoins(); resetPositions(); levelStats = { time: 0, eaten: 0 };
   mode = 'ready'; readyT = 3.2; paused = false;
-  document.getElementById('title').classList.add('hidden');
-  document.getElementById('over').classList.add('hidden');
+  for (const id of ['title', 'over', 'win']) document.getElementById(id).classList.add('hidden');
   SFX.start(); updateHUD(true);
 }
 function nextLevel() {
-  level++; resetCoins(); resetPositions(); mode = 'ready'; readyT = 2; updateHUD(true);
+  document.getElementById('win').classList.add('hidden');
+  level++; resetCoins(); resetPositions(); levelStats = { time: 0, eaten: 0 };
+  mode = 'ready'; readyT = 2; updateHUD(true);
+}
+function showWin() {
+  mode = 'win'; winT = 0;
+  confetti = Array.from({ length: 40 }, () => ({ x: Math.random() * CW, y: -Math.random() * CH, vy: 22 + Math.random() * 30, vx: (Math.random() - 0.5) * 12, k: 1.5 + Math.random() }));
+  const secs = Math.round(levelStats.time);
+  document.getElementById('winLevel').textContent = 'LEVEL ' + level + ' CLEARED';
+  document.getElementById('winBag').textContent = 'Ð' + score.toLocaleString('en-US');
+  document.getElementById('winTime').textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+  document.getElementById('winEaten').textContent = levelStats.eaten;
+  document.getElementById('nextHint').textContent = (IS_TOUCH ? 'TAP' : 'PRESS ENTER') + ' FOR LEVEL ' + (level + 1);
+  document.getElementById('win').classList.remove('hidden');
+  SFX.win();
+  showTweet('Level ' + level + ' done. Doge to the moon 🚀🐕');
+  // a cleared level already counts on the leaderboard, in case the player quits here
+  const wr = document.getElementById('winRank');
+  wr.textContent = '';
+  if (LB.online && playerName) {
+    wr.textContent = 'SAVING...';
+    submitScore().then(d => { wr.textContent = rankText(d); }, err => { wr.textContent = ERR_TEXT[err.message] || ERR_TEXT.offline; });
+  }
 }
 function afterDeath() {
   lives--; updateHUD(true);
@@ -315,9 +401,103 @@ function gameOver() {
   if (killer) face.getContext('2d').drawImage(FACES[killer.def.id].normal.full, 0, 0);
   document.getElementById('goKiller').innerHTML = 'CAUGHT BY<br>' + (killer ? killer.def.killMsg : 'THE MARKET');
   document.getElementById('goBag').textContent = 'Ð' + score.toLocaleString('en-US');
-  document.getElementById('goMeta').innerHTML = 'LEVEL ' + level + '<br>HI Ð' + hi.toLocaleString('en-US');
+  document.getElementById('goMeta').textContent = 'LEVEL ' + level + ' · HI Ð' + hi.toLocaleString('en-US');
   document.getElementById('over').classList.remove('hidden');
   updateHUD(true);
+  if (LB.online) gameOverBoard();
+}
+
+// ---------- leaderboard ----------
+// Scores go to the Cloudflare worker in src/worker.js. On a plain file server the API is missing,
+// so the leaderboard UI hides itself and the game works as before.
+const LB = { online: false, boards: null, tab: 'today' };
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+};
+function newPlayerId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+let playerId = store.get('bagman_pid');
+if (!playerId || !/^[a-f0-9-]{16,40}$/.test(playerId)) { playerId = newPlayerId(); store.set('bagman_pid', playerId); }
+let playerName = store.get('bagman_name') || '';
+const cleanName = v => String(v || '').toUpperCase().replace(/[^A-Z0-9_]/g, '').slice(0, 12);
+const ERR_TEXT = {
+  blocked_name: 'PICK ANOTHER NAME', bad_name: 'LETTERS, NUMBERS AND _ ONLY', rate_limited: 'TOO MANY SCORES. TRY LATER',
+  implausible: 'SCORE REJECTED', offline: 'LEADERBOARD OFFLINE',
+};
+const rankText = d => '#' + d.rankToday + ' TODAY · #' + d.rankAll + ' ALL TIME';
+
+async function api(path, opts) {
+  let res;
+  try { res = await fetch('/api/' + path, opts); } catch (e) { throw new Error('offline'); }
+  const data = await res.json().catch(() => null);
+  if (!data) throw new Error('offline');
+  if (!res.ok) throw new Error(data.error || 'offline');
+  return data;
+}
+async function loadBoards() {
+  const d = await api('leaderboard');
+  LB.boards = { today: d.today, all: d.all };
+  return LB.boards;
+}
+async function submitScore() {
+  const d = await api('score', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: playerName, playerId, score, level, duration: Math.max(1, Math.round(runTime)) }),
+  });
+  LB.boards = { today: d.today, all: d.all };
+  return d;
+}
+function renderRows(el, rows, max, title) {
+  el.textContent = '';
+  const add = (cls, text) => { const div = document.createElement('div'); div.className = cls; div.textContent = text; el.append(div); return div; };
+  if (title) add('head', title);
+  if (!rows || !rows.length) { add('empty', 'NO SCORES YET. BE FIRST!'); return; }
+  for (const r of rows.slice(0, max)) {
+    const row = add('row' + (r.name === playerName ? ' me' : ''), '');
+    for (const t of ['#' + r.rank, r.name, 'Ð' + r.score.toLocaleString('en-US')]) {
+      const span = document.createElement('span'); span.textContent = t; row.append(span);
+    }
+  }
+}
+function gameOverBoard() {
+  const input = document.getElementById('nameInput');
+  input.value = playerName;
+  document.getElementById('goBoard').textContent = '';
+  if (playerName && score > 0) return saveRun();
+  document.getElementById('rankLine').textContent = score > 0 ? 'ENTER A NAME TO JOIN THE LEADERBOARD' : '';
+  loadBoards().then(b => renderRows(document.getElementById('goBoard'), b.today, 5, "TODAY'S TOP 5"), () => {});
+  if (!IS_TOUCH && score > 0) input.focus();
+}
+function saveRun() {
+  const line = document.getElementById('rankLine');
+  line.textContent = 'SAVING...';
+  submitScore().then(d => {
+    line.textContent = rankText(d);
+    renderRows(document.getElementById('goBoard'), d.today, 5, "TODAY'S TOP 5");
+  }, err => { line.textContent = ERR_TEXT[err.message] || ERR_TEXT.offline; });
+}
+function saveName() {
+  const input = document.getElementById('nameInput'), name = cleanName(input.value);
+  input.blur();
+  if (!name) return;
+  playerName = name; input.value = name; store.set('bagman_name', name);
+  if (score > 0) saveRun();
+}
+const boardOpen = () => !document.getElementById('board').classList.contains('hidden');
+function showBoardTab(tab) {
+  LB.tab = tab;
+  document.querySelectorAll('#board .tabs .btn').forEach(b => b.classList.toggle('on', b.dataset.board === tab));
+  const rows = document.getElementById('boardRows');
+  if (LB.boards) renderRows(rows, LB.boards[tab], 10); else rows.textContent = 'LOADING...';
+  document.getElementById('boardNote').textContent = tab === 'today' ? 'RESETS DAILY AT 00:00 UTC' : '';
+}
+function openBoard() {
+  document.getElementById('board').classList.remove('hidden');
+  showBoardTab(LB.tab);
+  loadBoards().then(() => showBoardTab(LB.tab), () => { document.getElementById('boardNote').textContent = ERR_TEXT.offline; });
 }
 
 // ---------- movement ----------
@@ -368,7 +548,9 @@ function decideGhost(g) {
   if (g.state === 'eaten' && cx === HOUSE_DOOR.x && cy === HOUSE_DOOR.y) { g.state = 'entering'; g.dir = NONE; return; }
   let opts = DIR_LIST.filter(d => d !== rev(g.dir) && open(cx + d.x, cy + d.y));
   if (!opts.length) opts = [rev(g.dir)];
-  if (g.frightened) { g.dir = opts[(Math.random() * opts.length) | 0]; return; }
+  if (g.frightened || (g.state === 'active' && opts.length > 1 && Math.random() < wanderChance())) {
+    g.dir = opts[(Math.random() * opts.length) | 0]; return;
+  }
   const t = ghostTarget(g);
   let best = opts[0], bd = Infinity;
   for (const d of opts) { const dx = cx + d.x - t.x, dy = cy + d.y - t.y, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = d; } }
@@ -378,10 +560,10 @@ function distTo(a, b) { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, W - dx);
 function ghostSpeed(g) {
   if (g.state === 'eaten') return 13;
   if (g.state === 'house' || g.state === 'leaving' || g.state === 'entering') return 4;
-  if (Math.round(g.y) === 9 && (g.x < 5 || g.x > 15)) return 3.4;
-  if (g.frightened) return 3.6;
-  let s = lvlMul(6.0, 0.05, 1.3);
-  if (g.def.id === 'bezos' && globalMode === 'chase' && distTo(g, player) <= 8) s *= 1.15;
+  if (Math.round(g.y) === 9 && (g.x < 5 || g.x > 15)) return 3.0;
+  if (g.frightened) return 3.2;
+  let s = lvlMul(RIVAL_SPEED, 0.05, 1.4);
+  if (g.def.id === 'bezos' && globalMode === 'chase' && distTo(g, player) <= 8) s *= 1.12;
   return s;
 }
 function updateGhost(g, dt) {
@@ -420,9 +602,10 @@ function step(h) {
       ghosts.forEach(g => { if (g.state === 'active') g.dir = rev(g.dir); });
     }
   }
+  levelStats.time += h; runTime += h;
   // player
   const before = { x: player.x, y: player.y };
-  moveGrid(player, lvlMul(6.6, 0.03, 1.2) * h, decidePlayer);
+  moveGrid(player, lvlMul(PLAYER_SPEED, 0.02, 1.15) * h, decidePlayer);
   if (player.dir === NONE) decidePlayer(player);
   let moved = Math.abs(player.x - before.x); if (moved > 1) moved = 0; moved += Math.abs(player.y - before.y);
   player.anim += moved * 3;
@@ -439,10 +622,10 @@ function step(h) {
   // collisions
   for (const g of ghosts) {
     if (g.state !== 'active' && g.state !== 'leaving') continue;
-    if (distTo(g, player) > 0.7) continue;
+    if (distTo(g, player) > HIT_RADIUS) continue;
     if (g.frightened) {
       const pts = 200 * Math.pow(2, combo); combo = Math.min(combo + 1, 3);
-      addScore(pts); g.state = 'eaten'; g.frightened = false;
+      addScore(pts); g.state = 'eaten'; g.frightened = false; levelStats.eaten++;
       addFloat(g.x, g.y - 0.6, g.def.eatMsg, '#fff', 1.1);
       addFloat(g.x, g.y + 0.5, '+' + pts, '#35e0ff', 1.1);
       freezeT = 0.5; shakeT = 0.15; SFX.eat();
@@ -454,7 +637,7 @@ function step(h) {
 }
 function powerUp() {
   addScore(50); combo = 0;
-  frightT = Math.max(2, 7 - (level - 1));
+  frightT = frightSeconds();
   ghosts.forEach(g => {
     if (g.state === 'eaten' || g.state === 'entering') return;
     g.frightened = true;
@@ -466,9 +649,9 @@ function powerUp() {
   showTweet();
 }
 let tweetTimer = null;
-function showTweet() {
+function showTweet(text) {
   const el = document.getElementById('tweet');
-  document.getElementById('tweetText').textContent = TWEETS[(Math.random() * TWEETS.length) | 0];
+  document.getElementById('tweetText').textContent = text || TWEETS[(Math.random() * TWEETS.length) | 0];
   el.classList.add('show');
   clearTimeout(tweetTimer);
   tweetTimer = setTimeout(() => el.classList.remove('show'), 1700);
@@ -497,16 +680,61 @@ function update(dt) {
       break;
     }
     case 'dying': dyingT += dt; if (dyingT >= 2.2) afterDeath(); break;
-    case 'clear': clearT += dt; if (clearT >= 2.2) nextLevel(); break;
+    case 'clear': clearT += dt; if (clearT >= 1.4) showWin(); break;
+    case 'win':
+      winT += dt;
+      for (const c of confetti) {
+        c.x += c.vx * dt; c.y += c.vy * dt;
+        if (c.y > CH + 6) { c.y = -6; c.x = Math.random() * CW; }
+      }
+      break;
   }
 }
 
 const cxOf = v => (v + 0.5) * T;
-function drawCoin(x, y) {
-  const cx = x * T + 4, cy = y * T + 4;
-  ctx.fillStyle = '#f7c948'; ctx.fillRect(cx + 1, cy, 2, 1); ctx.fillRect(cx, cy + 1, 4, 2); ctx.fillRect(cx + 1, cy + 3, 2, 1);
-  ctx.fillStyle = '#fff3b0'; ctx.fillRect(cx + 1, cy + 1, 1, 1);
-  ctx.fillStyle = '#c9961a'; ctx.fillRect(cx + 3, cy + 2, 1, 1); ctx.fillRect(cx + 2, cy + 3, 1, 1);
+// Doge coin: 4x4 pixel pattern; `k` scales each pixel (1 in the maze, bigger for the win confetti)
+function drawCoin(x, y, k = 1, cx = x * T + 4, cy = y * T + 4) {
+  const P = (px, py, w, h) => ctx.fillRect(cx + px * k, cy + py * k, w * k, h * k);
+  ctx.fillStyle = '#f7c948'; P(1, 0, 2, 1); P(0, 1, 4, 2); P(1, 3, 2, 1);
+  ctx.fillStyle = '#fff3b0'; P(1, 1, 1, 1);
+  ctx.fillStyle = '#c9961a'; P(3, 2, 1, 1); P(2, 3, 1, 1);
+}
+// Win scene: Elon rides a rocket to the moon while Doge coins rain down
+function renderWin() {
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
+  ctx.fillStyle = '#fff';
+  for (const s of STARS) { ctx.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(time * s.tw + s.ph)); ctx.fillRect(Math.round(s.x), Math.round(s.y), s.r, s.r); }
+  ctx.globalAlpha = 1;
+  const mx = 196, my = 62, mr = 28;
+  ctx.fillStyle = '#d9dce6'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#b4b9c9';
+  for (const [dx, dy, r] of [[-11, -7, 6], [9, 7, 8], [-5, 14, 4], [13, -13, 3], [-17, 8, 3]]) { ctx.beginPath(); ctx.arc(mx + dx, my + dy, r, 0, Math.PI * 2); ctx.fill(); }
+  const FLY = 2.2, e = Math.min(1, winT / FLY), ease = 1 - Math.pow(1 - e, 3);
+  const sx = 40, sy = CH + 34, ex = mx - 8, ey = my - mr - 10;
+  if (e < 1) {
+    const ang = Math.atan2(ey - sy, ex - sx) + Math.PI / 2;
+    for (let i = 1; i <= 5; i++) { // exhaust trail
+      const p = Math.max(0, ease - i * 0.03);
+      ctx.globalAlpha = 0.45 - i * 0.07; ctx.fillStyle = i < 3 ? '#ffb347' : '#d9dce6';
+      ctx.beginPath(); ctx.arc(sx + (ex - sx) * p, sy + (ey - sy) * p + 14, 2 + i * 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.save();
+    ctx.translate(sx + (ex - sx) * ease, sy + (ey - sy) * ease); ctx.rotate(ang);
+    ctx.drawImage(ROCKET_SPR[Math.floor(time * 12) % 2], -18, -16, 36, 40);
+    drawFace(FACES.elon.normal, 0, -2, 17, 0.5 + 0.5 * Math.sin(time * 14));
+    ctx.restore();
+  } else {
+    // landed: Elon on the moon next to a Doge flag
+    ctx.fillStyle = '#c9ced6'; ctx.fillRect(mx + 12, my - mr - 26, 1, 28);
+    ctx.fillStyle = '#f7c948'; ctx.fillRect(mx + 13, my - mr - 26, 15, 10);
+    ctx.fillStyle = '#000'; ctx.font = '8px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Ð', mx + 21, my - mr - 20);
+    drawFace(FACES.elon.normal, mx - 8, my - mr - 9 + Math.sin(time * 3), 24, 0.5 + 0.5 * Math.sin(time * 9), { rot: Math.sin(time * 2) * 0.08 });
+  }
+  ctx.imageSmoothingEnabled = false;
+  for (const c of confetti) drawCoin(0, 0, c.k, Math.round(c.x), Math.round(c.y));
 }
 // A face disc with a puppet jaw: the chin drops by `open` (0..1) to reveal a mouth.
 function drawFace(set, x, y, D, open, opts = {}) {
@@ -562,6 +790,7 @@ function label(text, row, color) {
 }
 function render() {
   ctx.setTransform(R, 0, 0, R, 0, 0);
+  if (mode === 'win') return renderWin();
   ctx.imageSmoothingEnabled = false;
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, CH);
   if (shakeT > 0) { const m = Math.ceil(shakeT * 8); ctx.translate(Math.round((Math.random() * 2 - 1) * m), Math.round((Math.random() * 2 - 1) * m)); }
@@ -600,7 +829,7 @@ function render() {
   ctx.setTransform(R, 0, 0, R, 0, 0);
   if (mode === 'ready') label(level > 1 && readyT > 1.2 ? 'LEVEL ' + level : 'READY!', 11, '#f7c948');
   if (mode === 'dying' && dyingT > 0.6 && killer) label('REKT BY ' + killer.def.killMsg, 11, '#ff4848');
-  if (mode === 'clear') label('TO THE MOON!', 11, '#f7c948');
+  if (mode === 'clear') label('LEVEL CLEAR!', 11, '#f7c948');
   if (paused) label('PAUSED', 11, '#fff');
 }
 
@@ -621,7 +850,7 @@ function updateHUD(force) {
   document.getElementById('hi').textContent = 'Ð' + Math.max(hi, score).toLocaleString('en-US');
   document.getElementById('lvl').textContent = level;
   const lv = document.getElementById('lives'); lv.innerHTML = '';
-  const n = mode === 'title' ? 2 : Math.max(0, lives - 1);
+  const n = mode === 'title' ? START_LIVES - 1 : Math.max(0, lives - 1);
   for (let i = 0; i < n; i++) lv.appendChild(cloneCanvas(FACES.elon.normal.full));
 }
 function fit() {
@@ -638,34 +867,65 @@ function fit() {
 
 // ---------- input ----------
 const KEYMAP = { ArrowUp: UP, KeyW: UP, ArrowDown: DOWN, KeyS: DOWN, ArrowLeft: LEFT, KeyA: LEFT, ArrowRight: RIGHT, KeyD: RIGHT };
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches;
 function setDir(d) {
   if (!player) return;
   player.next = d;
-  if (player.dir !== NONE && d === rev(player.dir)) { player.dir = d; if (d.x) player.face = d; }
+  if (player.dir === NONE || d === player.dir) return;
+  if (d === rev(player.dir)) { player.dir = d; if (d.x) player.face = d; return; }
+  // Late-turn forgiveness: if Elon just passed a junction where `d` was open, snap back and take it.
+  if (mode !== 'play') return;
+  const bx = player.dir.x > 0 ? Math.floor(player.x) : player.dir.x < 0 ? Math.ceil(player.x) : Math.round(player.x);
+  const by = player.dir.y > 0 ? Math.floor(player.y) : player.dir.y < 0 ? Math.ceil(player.y) : Math.round(player.y);
+  const back = Math.abs(player.x - bx) + Math.abs(player.y - by);
+  if (back > 0 && back < 0.35 && open(bx + d.x, by + d.y)) {
+    player.x = bx; player.y = by; player.dir = d; if (d.x) player.face = d;
+  }
 }
 const creditsOpen = () => !document.getElementById('credits').classList.contains('hidden');
 function tryStart() {
-  if (creditsOpen()) return;
+  if (creditsOpen() || boardOpen()) return;
   if (mode === 'title') startGame();
   else if (mode === 'over' && time >= restartAt) startGame();
+  else if (mode === 'win' && winT >= 1.2) nextLevel();
 }
 function togglePause() { if (mode === 'play' || mode === 'ready') paused = !paused; }
+const nameInput = document.getElementById('nameInput');
 window.addEventListener('keydown', e => {
+  if (e.target === nameInput) {
+    // Enter saves the name; Enter on an empty box just retries
+    if (e.key === 'Enter') { e.preventDefault(); if (cleanName(nameInput.value)) saveName(); else { nameInput.blur(); tryStart(); } }
+    else if (e.key === 'Escape') nameInput.blur();
+    return;
+  }
+  if (e.code === 'Escape' && (creditsOpen() || boardOpen())) {
+    document.getElementById('credits').classList.add('hidden'); document.getElementById('board').classList.add('hidden'); return;
+  }
   if (KEYMAP[e.code]) { e.preventDefault(); setDir(KEYMAP[e.code]); return; }
   if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); tryStart(); }
   else if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
   else if (e.code === 'KeyM') muted = !muted;
 });
+nameInput.addEventListener('input', () => { nameInput.value = cleanName(nameInput.value); });
+document.getElementById('nameRow').addEventListener('pointerdown', e => e.stopPropagation());
+document.getElementById('nameSave').addEventListener('click', saveName);
 document.getElementById('title').addEventListener('pointerdown', tryStart);
-document.getElementById('over').addEventListener('pointerdown', tryStart);
+document.getElementById('over').addEventListener('pointerdown', () => {
+  // first tap outside the name box only closes the keyboard
+  if (document.activeElement === nameInput) nameInput.blur(); else tryStart();
+});
+document.getElementById('win').addEventListener('pointerdown', tryStart);
 document.getElementById('creditsLink').addEventListener('pointerdown', e => {
   e.stopPropagation(); document.getElementById('credits').classList.remove('hidden');
 });
 document.getElementById('creditsBack').addEventListener('click', () => document.getElementById('credits').classList.add('hidden'));
+document.getElementById('boardLink').addEventListener('pointerdown', e => { e.stopPropagation(); openBoard(); });
+document.getElementById('boardBack').addEventListener('click', () => document.getElementById('board').classList.add('hidden'));
+document.querySelectorAll('#board .tabs .btn').forEach(b => b.addEventListener('click', () => showBoardTab(b.dataset.board)));
 let touch = null;
 window.addEventListener('touchstart', e => { const t = e.changedTouches[0]; touch = { x: t.clientX, y: t.clientY }; ensureAudio(); }, { passive: true });
 window.addEventListener('touchmove', e => {
-  if (creditsOpen()) return;
+  if (creditsOpen() || boardOpen()) return;
   e.preventDefault();
   if (!touch) return;
   const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
@@ -684,7 +944,13 @@ window.addEventListener('resize', fit);
   const imgs = await Promise.all(ids.map(id => loadImage(FACE_CFG[id].src)));
   ids.forEach((id, i) => buildFace(id, imgs[i]));
 
-  if (matchMedia('(pointer: coarse)').matches) {
+  const rekt = document.getElementById('winRekt');
+  for (const d of ENEMY_DEFS) {
+    const cell = document.createElement('div');
+    cell.append(cloneCanvas(FACES[d.id].fright.full), 'REKT');
+    rekt.append(cell);
+  }
+  if (IS_TOUCH) {
     document.getElementById('startHint').textContent = 'TAP TO START';
     document.getElementById('retryHint').textContent = 'TAP TO RETRY';
     document.getElementById('foot').textContent = 'SWIPE TO MOVE';
@@ -701,6 +967,7 @@ window.addEventListener('resize', fit);
   av.getContext('2d').drawImage(FACES.elon.normal.full, 0, 0);
 
   resetCoins(); resetPositions(); fit(); updateHUD(true);
+  loadBoards().then(() => { LB.online = true; }, () => { document.body.classList.add('no-lb'); });
   const go = () => requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
   if (document.fonts && document.fonts.load) {
     Promise.race([document.fonts.load('8px "Press Start 2P"'), new Promise(r => setTimeout(r, 1500))]).then(go, go);
