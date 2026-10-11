@@ -9,8 +9,8 @@
     {
       "binding": "DB",
       "database_name": "bagman",
-      // Placeholder for local dev. Replace with the id printed by `npx wrangler d1 create bagman` before deploying.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // Live database (created with `npx wrangler d1 create bagman`). Local dev uses its own copy in .wrangler/.
+      "database_id": "55537f00-a0ec-438f-b473-fb0acef3d396",
       "migrations_dir": "migrations"
     }
   ],
