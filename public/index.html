@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>BAGMAN</title>
+<meta name="description" content="Elon eats Doge. Zuckerberg, Gates, Altman and Bezos chase him. A free Pac-Man-style parody game.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="BAGMAN">
+<meta property="og:title" content="BAGMAN">
+<meta property="og:description" content="Elon eats Doge. The billionaires chase him.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -11,10 +23,22 @@
 :root{--s:2;--bg:#000;--gold:#f7c948;--pink:#ff5fa2;--blue:#3060ff;--cyan:#35e0ff;--dim:#7d84a3}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:#fff;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-items:center;justify-content:center;padding:16px}
+body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+[hidden]{display:none!important}
 #wrap{display:flex;flex-direction:column;align-items:center}
-#hud{display:flex;justify-content:space-between;align-items:flex-end;width:100%;height:calc(var(--s)*26px);padding-bottom:calc(var(--s)*4px);font-size:calc(var(--s)*7px);line-height:1.5}
+#hud{display:flex;justify-content:space-between;align-items:flex-end;width:100%;height:max(52px,calc(var(--s)*26px));padding-bottom:calc(var(--s)*4px);font-size:calc(var(--s)*7px);line-height:1.5}
 #hud .lbl{color:var(--pink)}
+#hud .left{display:flex;align-items:flex-end;gap:calc(var(--s)*5px)}
+.hud-btn{font-family:inherit;font-size:max(12px,calc(var(--s)*7px));width:max(44px,calc(var(--s)*17px));height:max(44px,calc(var(--s)*17px));flex:none;display:flex;align-items:center;justify-content:center;padding:0;background:#11142b;color:#fff;border:1px solid #3a4170;cursor:pointer}
+.hud-btn.off{visibility:hidden}
+.menu-btn{font-family:inherit;font-size:max(11px,calc(var(--s)*7px));line-height:1.4;min-height:44px;min-width:calc(var(--s)*92px);padding:calc(var(--s)*3px) calc(var(--s)*7px);background:var(--gold);color:#000;border:0;cursor:pointer}
+.menu-btn small{display:block;font-size:max(8px,calc(var(--s)*4.5px));opacity:.7;margin-top:2px}
+.menu-btn.alt{background:#141833;color:#fff;border:1px solid #3a4170}
+.title-actions{display:flex;gap:calc(var(--s)*5px)}
+#pauseMenu{background:rgba(0,0,0,.9);cursor:default}
+#pauseMenu .menu-btn{min-width:calc(var(--s)*130px)}
+.pause-title{font-size:calc(var(--s)*16px);color:var(--gold);text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 var(--pink)}
+.logo-art{width:calc(var(--s)*232px);height:calc(var(--s)*46px)}
 #hud .mid{text-align:center}
 #hud .right{text-align:right}
 #lives{display:flex;gap:calc(var(--s)*2px);justify-content:flex-end;min-height:calc(var(--s)*11px)}
@@ -24,11 +48,11 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
 #foot{margin-top:10px;font-size:8px;color:var(--dim);text-align:center;line-height:1.8}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(0,0,0,.86);gap:calc(var(--s)*6px);cursor:pointer}
 .overlay.hidden{display:none}
-.logo{font-size:calc(var(--s)*28px);color:var(--gold);text-shadow:calc(var(--s)*2px) calc(var(--s)*2px) 0 var(--pink),calc(var(--s)*-1px) calc(var(--s)*-1px) 0 var(--blue);letter-spacing:calc(var(--s)*1px)}
 .tag{font-size:calc(var(--s)*7px);line-height:1.7}
 .edition{font-size:calc(var(--s)*6px);color:var(--bg);background:var(--gold);padding:calc(var(--s)*3px) calc(var(--s)*5px)}
-.cast{display:grid;grid-template-columns:auto auto;gap:calc(var(--s)*3px) calc(var(--s)*6px);align-items:center;text-align:left;margin-top:calc(var(--s)*2px)}
-.cast canvas{width:calc(var(--s)*22px);height:calc(var(--s)*22px)}
+#title{gap:calc(var(--s)*5px)}
+.cast{display:grid;grid-template-columns:auto auto;gap:calc(var(--s)*2px) calc(var(--s)*6px);align-items:center;text-align:left}
+.cast canvas{width:calc(var(--s)*18px);height:calc(var(--s)*18px)}
 .cast .n{font-size:calc(var(--s)*6px);line-height:1.6}
 .cast .d{font-size:calc(var(--s)*5px);color:var(--dim)}
 .blink{font-size:calc(var(--s)*7px);animation:blink 1s steps(2) infinite}
@@ -43,17 +67,18 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
 .go-small{font-size:calc(var(--s)*6px);color:var(--dim);line-height:1.8}
 .links{display:flex;gap:calc(var(--s)*10px)}
 .btn{font-family:inherit;font-size:calc(var(--s)*6px);background:var(--gold);color:#000;border:0;padding:calc(var(--s)*3px) calc(var(--s)*6px);cursor:pointer}
-.name-row{display:flex;gap:calc(var(--s)*3px);align-items:stretch}
-.name-row input{font-family:inherit;font-size:max(16px,calc(var(--s)*7px));width:calc(var(--s)*100px);background:#000;color:var(--gold);border:1px solid var(--gold);border-radius:0;padding:calc(var(--s)*2px) calc(var(--s)*3px);text-transform:uppercase;outline:none;-webkit-user-select:text;user-select:text}
-.name-row input::placeholder{color:#6b5a1e}
-.rank-line{font-size:calc(var(--s)*6px);color:var(--cyan);line-height:1.6;min-height:1.6em}
+.field{display:flex;flex-direction:column;align-items:center;gap:calc(var(--s)*2px);font-size:calc(var(--s)*5px);color:var(--pink)}
+.field input{font-family:inherit;font-size:max(16px,calc(var(--s)*8px));width:calc(var(--s)*124px);min-height:44px;text-align:center;background:#000;color:var(--gold);border:1px solid var(--gold);border-radius:0;padding:0 calc(var(--s)*3px);text-transform:uppercase;outline:none;-webkit-user-select:text;user-select:text}
+.field input::placeholder{color:#6b5a1e}
+.rank-line{font-size:calc(var(--s)*6px);color:var(--cyan);line-height:1.6;min-height:1.6em;white-space:pre-line}
 .rows{width:calc(var(--s)*176px);font-size:calc(var(--s)*6px);line-height:1.9;text-align:left}
 .rows .head{color:var(--pink);font-size:calc(var(--s)*5px)}
 .rows .row{display:grid;grid-template-columns:calc(var(--s)*24px) 1fr auto;gap:calc(var(--s)*4px)}
 .rows .row.me{color:var(--gold)}
 .rows .empty{color:var(--dim);text-align:center}
-#board{cursor:default}
-#board,#credits{background:rgba(0,0,0,.96)}
+#board,#account{cursor:default}
+#board,#credits,#account{background:rgba(0,0,0,.96)}
+#account h2{font-size:calc(var(--s)*9px);color:var(--gold);font-weight:400}
 #board h2{font-size:calc(var(--s)*9px);color:var(--gold);font-weight:400}
 .tabs{display:flex;gap:calc(var(--s)*3px)}
 .tabs .btn{background:#222;color:#fff}
@@ -89,7 +114,7 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
 <body>
 <div id="wrap">
   <div id="hud">
-    <div><div class="lbl">BAG</div><div id="score">Ð0</div></div>
+    <div class="left"><button class="hud-btn off" id="pauseBtn" aria-label="Pause">II</button><div><div class="lbl">BAG</div><div id="score">Ð0</div></div></div>
     <div class="mid"><div class="lbl">HI</div><div id="hi">Ð0</div></div>
     <div class="right"><div class="lbl">LVL <span id="lvl">1</span></div><div id="lives"></div></div>
   </div>
@@ -98,11 +123,15 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
     <div id="pump">PUMP!</div>
     <div id="tweet"><canvas id="avatar"></canvas><div><div class="tn">Elon <span>@elon · now</span></div><div class="tt" id="tweetText">🚀🐕</div></div></div>
     <div id="title" class="overlay">
-      <div class="logo">BAGMAN</div>
+      <canvas class="logo-art" id="logoArt" role="img" aria-label="BAGMAN"></canvas>
       <div class="tag">PICK YOUR WHALE.<br>CHASE YOUR BAG.</div>
       <div class="edition">ELON EDITION</div>
       <div class="cast" id="cast"></div>
       <div class="blink" id="startHint">PRESS ENTER</div>
+      <div class="title-actions" id="titleActions" hidden>
+        <button class="menu-btn" id="continueBtn">CONTINUE<small id="continueInfo"></small></button>
+        <button class="menu-btn alt" id="newGameBtn">NEW GAME</button>
+      </div>
       <div class="links"><span class="link lb" id="boardLink">LEADERBOARD</span><span class="link" id="creditsLink">PHOTO CREDITS</span></div>
     </div>
     <div id="over" class="overlay hidden">
@@ -110,7 +139,7 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
       <div class="go-row"><canvas class="go-face" id="goFace"></canvas><div class="go-killer" id="goKiller"></div></div>
       <div class="go-bag" id="goBag">Ð0</div>
       <div class="go-small" id="goMeta"></div>
-      <div class="name-row lb" id="nameRow"><input id="nameInput" maxlength="12" placeholder="YOUR NAME" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done"><button class="btn" id="nameSave">SAVE</button></div>
+      <button class="menu-btn lb" id="saveScoreBtn" hidden>SAVE MY SCORE</button>
       <div class="rank-line lb" id="rankLine"></div>
       <div class="rows lb" id="goBoard"></div>
       <div class="blink" id="retryHint">PRESS ENTER</div>
@@ -127,12 +156,29 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
       <div class="win-rekt" id="winRekt"></div>
       <div class="blink" id="nextHint">PRESS ENTER FOR LEVEL 2</div>
     </div>
+    <div id="pauseMenu" class="overlay hidden">
+      <div class="pause-title">PAUSED</div>
+      <div class="go-small" id="pauseStats"></div>
+      <button class="menu-btn" id="resumeBtn">RESUME</button>
+      <button class="menu-btn alt" id="soundBtn">SOUND: ON</button>
+      <button class="menu-btn alt" id="quitBtn">SAVE &amp; QUIT</button>
+      <div class="go-small">CONTINUE ANYTIME<br>FROM THE TITLE SCREEN</div>
+    </div>
     <div id="board" class="overlay hidden">
       <h2>LEADERBOARD</h2>
       <div class="tabs"><button class="btn on" data-board="today">TODAY</button><button class="btn" data-board="all">ALL TIME</button></div>
       <div class="rows" id="boardRows"></div>
       <div class="go-small" id="boardNote"></div>
-      <button class="btn" id="boardBack">BACK</button>
+      <div class="go-small" id="boardWho"></div>
+      <div class="title-actions"><button class="menu-btn alt" id="boardLogin">LOG IN</button><button class="menu-btn" id="boardBack">BACK</button></div>
+    </div>
+    <div id="account" class="overlay hidden">
+      <h2>YOUR NAME</h2>
+      <div class="go-small">NEW NAME? PICK A 4-DIGIT PIN TO CLAIM IT.<br>TAKEN NAME? ITS PIN LOGS YOU IN<br>ON ANY PHONE.</div>
+      <label class="field"><span>NAME</span><input id="nameInput" maxlength="12" placeholder="YOUR NAME" autocomplete="username" autocapitalize="characters" spellcheck="false" enterkeyhint="next"></label>
+      <label class="field"><span>PIN</span><input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4 DIGITS" autocomplete="current-password" enterkeyhint="go"></label>
+      <div class="rank-line" id="accountMsg"></div>
+      <div class="title-actions"><button class="menu-btn alt" id="accountBack">CANCEL</button><button class="menu-btn" id="accountGo">SAVE</button></div>
     </div>
     <div id="credits" class="overlay hidden">
       <h2>PHOTO CREDITS</h2>
@@ -224,9 +270,9 @@ function makeDisc(img, cfg, tint) {
     if (tint) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = tint; g.fillRect(0, 0, FACE_RES, FACE_RES); }
   });
 }
-function splitDisc(disc, my) {
+function splitDisc(disc, my, ring) {
   return {
-    full: disc, my,
+    full: disc, my, ring,
     top: canvasOf(FACE_RES, FACE_RES, g => g.drawImage(disc, 0, 0, FACE_RES, my, 0, 0, FACE_RES, my)),
     bot: canvasOf(FACE_RES, FACE_RES - my, g => g.drawImage(disc, 0, my, FACE_RES, FACE_RES - my, 0, 0, FACE_RES, FACE_RES - my)),
   };
@@ -234,7 +280,7 @@ function splitDisc(disc, my) {
 function buildFace(id, img) {
   const cfg = FACE_CFG[id];
   const my = Math.round(cfg.mouth / FACE_SRC_SIZE * FACE_RES);
-  const mk = tint => splitDisc(makeDisc(img, cfg, tint), my);
+  const mk = tint => splitDisc(makeDisc(img, cfg, tint), my, cfg.ring);
   FACES[id] = { normal: mk(null), fright: mk('rgba(34,51,255,0.62)'), flash: mk('rgba(255,255,255,0.78)') };
 }
 
@@ -287,6 +333,7 @@ const MAZE_BLUE = makeMaze('#3060ff'), MAZE_WHITE = makeMaze('#ffffff');
 
 // ---------- audio ----------
 let actx = null, muted = false, chompAlt = false;
+try { muted = localStorage.getItem('bagman_muted') === '1'; } catch (e) {}
 function ensureAudio() {
   if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
   if (actx && actx.state === 'suspended') actx.resume();
@@ -317,6 +364,7 @@ const SFX = {
 // ---------- state ----------
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
+const logoCanvas = document.getElementById('logoArt'), logoCtx = logoCanvas.getContext('2d');
 let R = 2; // canvas pixels per maze pixel
 
 const TWEETS = ['🚀🐕', 'Doge to the moon 🚀', 'much wow 🐕', 'funding secured 🚀', "the people's crypto 🐕", '🐕🐕🐕'];
@@ -360,13 +408,15 @@ function startGame() {
   score = 0; lives = START_LIVES; level = 1; extraGiven = false; runTime = 0;
   resetCoins(); resetPositions(); levelStats = { time: 0, eaten: 0 };
   mode = 'ready'; readyT = 3.2; paused = false;
-  for (const id of ['title', 'over', 'win']) document.getElementById(id).classList.add('hidden');
+  for (const id of ['title', 'over', 'win', 'pauseMenu']) document.getElementById(id).classList.add('hidden');
+  clearSavedRun();
   SFX.start(); updateHUD(true);
 }
 function nextLevel() {
   document.getElementById('win').classList.add('hidden');
   level++; resetCoins(); resetPositions(); levelStats = { time: 0, eaten: 0 };
   mode = 'ready'; readyT = 2; updateHUD(true);
+  saveRun();
 }
 function showWin() {
   mode = 'win'; winT = 0;
@@ -385,13 +435,14 @@ function showWin() {
   wr.textContent = '';
   if (LB.online && playerName) {
     wr.textContent = 'SAVING...';
-    submitScore().then(d => { wr.textContent = rankText(d); }, err => { wr.textContent = ERR_TEXT[err.message] || ERR_TEXT.offline; });
+    submitScore().then(d => { wr.textContent = rankText(d); }, err => { if (needsLogin(err)) forgetLogin(); wr.textContent = errText(err); });
   }
 }
 function afterDeath() {
   lives--; updateHUD(true);
   if (lives <= 0) return gameOver();
   resetPositions(); mode = 'ready'; readyT = 2;
+  saveRun();
 }
 function gameOver() {
   mode = 'over'; restartAt = time + 0.9;
@@ -404,6 +455,7 @@ function gameOver() {
   document.getElementById('goMeta').textContent = 'LEVEL ' + level + ' · HI Ð' + hi.toLocaleString('en-US');
   document.getElementById('over').classList.remove('hidden');
   updateHUD(true);
+  clearSavedRun();
   if (LB.online) gameOverBoard();
 }
 
@@ -424,9 +476,14 @@ if (!playerId || !/^[a-f0-9-]{16,40}$/.test(playerId)) { playerId = newPlayerId(
 let playerName = store.get('bagman_name') || '';
 const cleanName = v => String(v || '').toUpperCase().replace(/[^A-Z0-9_]/g, '').slice(0, 12);
 const ERR_TEXT = {
-  blocked_name: 'PICK ANOTHER NAME', bad_name: 'LETTERS, NUMBERS AND _ ONLY', rate_limited: 'TOO MANY SCORES. TRY LATER',
+  blocked_name: 'PICK ANOTHER NAME', bad_name: 'LETTERS, NUMBERS AND _ ONLY', bad_pin: 'PIN MUST BE 4 DIGITS',
+  locked: 'TOO MANY WRONG PINS.\nTRY AGAIN IN 15 MIN', rate_limited: 'TOO MANY TRIES. TRY LATER',
+  not_logged_in: 'LOG IN TO SAVE YOUR SCORE', name_taken: 'LOG IN TO SAVE YOUR SCORE',
   implausible: 'SCORE REJECTED', offline: 'LEADERBOARD OFFLINE',
 };
+const errText = err => err.message === 'wrong_pin' && err.data
+  ? 'NAME TAKEN. WRONG PIN\n' + err.data.attemptsLeft + (err.data.attemptsLeft === 1 ? ' TRY' : ' TRIES') + ' LEFT'
+  : ERR_TEXT[err.message] || ERR_TEXT.offline;
 const rankText = d => '#' + d.rankToday + ' TODAY · #' + d.rankAll + ' ALL TIME';
 
 async function api(path, opts) {
@@ -434,22 +491,23 @@ async function api(path, opts) {
   try { res = await fetch('/api/' + path, opts); } catch (e) { throw new Error('offline'); }
   const data = await res.json().catch(() => null);
   if (!data) throw new Error('offline');
-  if (!res.ok) throw new Error(data.error || 'offline');
+  if (!res.ok) throw Object.assign(new Error(data.error || 'offline'), { data });
   return data;
 }
+const postJSON = body => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 async function loadBoards() {
   const d = await api('leaderboard');
   LB.boards = { today: d.today, all: d.all };
   return LB.boards;
 }
 async function submitScore() {
-  const d = await api('score', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: playerName, playerId, score, level, duration: Math.max(1, Math.round(runTime)) }),
-  });
+  const d = await api('score', postJSON({ name: playerName, playerId, score, level, duration: Math.max(1, Math.round(runTime)) }));
   LB.boards = { today: d.today, all: d.all };
   return d;
 }
+// the server no longer recognizes this device's name (e.g. it was never claimed): ask again
+function forgetLogin() { playerName = ''; try { localStorage.removeItem('bagman_name'); } catch (e) {} }
+const needsLogin = err => err.message === 'not_logged_in' || err.message === 'name_taken';
 function renderRows(el, rows, max, title) {
   el.textContent = '';
   const add = (cls, text) => { const div = document.createElement('div'); div.className = cls; div.textContent = text; el.append(div); return div; };
@@ -462,29 +520,73 @@ function renderRows(el, rows, max, title) {
     }
   }
 }
-function gameOverBoard() {
-  const input = document.getElementById('nameInput');
-  input.value = playerName;
-  document.getElementById('goBoard').textContent = '';
-  if (playerName && score > 0) return saveRun();
-  document.getElementById('rankLine').textContent = score > 0 ? 'ENTER A NAME TO JOIN THE LEADERBOARD' : '';
+function showTop5() {
   loadBoards().then(b => renderRows(document.getElementById('goBoard'), b.today, 5, "TODAY'S TOP 5"), () => {});
-  if (!IS_TOUCH && score > 0) input.focus();
 }
-function saveRun() {
+function gameOverBoard() {
+  document.getElementById('goBoard').textContent = '';
+  document.getElementById('saveScoreBtn').hidden = true;
+  if (score <= 0) { document.getElementById('rankLine').textContent = ''; return showTop5(); }
+  if (playerName) return submitRun();
+  askToSave('SAVE YOUR SCORE TO THE LEADERBOARD');
+}
+function askToSave(text) {
+  document.getElementById('saveScoreBtn').hidden = false;
+  document.getElementById('rankLine').textContent = text;
+  showTop5();
+}
+// sends this run's score to the leaderboard (saveRun is the local save for Continue)
+function submitRun() {
   const line = document.getElementById('rankLine');
   line.textContent = 'SAVING...';
   submitScore().then(d => {
-    line.textContent = rankText(d);
+    line.textContent = 'SAVED AS ' + playerName + '\n' + rankText(d);
     renderRows(document.getElementById('goBoard'), d.today, 5, "TODAY'S TOP 5");
-  }, err => { line.textContent = ERR_TEXT[err.message] || ERR_TEXT.offline; });
+  }, err => {
+    if (needsLogin(err)) { forgetLogin(); return askToSave(ERR_TEXT[err.message]); }
+    line.textContent = errText(err);
+  });
 }
-function saveName() {
-  const input = document.getElementById('nameInput'), name = cleanName(input.value);
-  input.blur();
-  if (!name) return;
-  playerName = name; input.value = name; store.set('bagman_name', name);
-  if (score > 0) saveRun();
+
+// ---------- name accounts ----------
+// A name belongs to whoever claimed it first, with a 4-digit PIN. The same name + PIN on another
+// device logs in: the server hands back the owner's player id and this device uses it from then on.
+let accountFrom = null, accountBusy = false;
+const accountOpen = () => !document.getElementById('account').classList.contains('hidden');
+function openAccount(from) {
+  accountFrom = from;
+  const name = document.getElementById('nameInput'), pin = document.getElementById('pinInput');
+  name.value = playerName; pin.value = '';
+  document.getElementById('accountMsg').textContent = '';
+  document.getElementById('accountGo').textContent = from === 'over' ? 'SAVE' : 'LOG IN';
+  document.getElementById('account').classList.remove('hidden');
+  if (!IS_TOUCH) (name.value ? pin : name).focus();
+}
+function closeAccount() {
+  document.getElementById('account').classList.add('hidden');
+  if (document.activeElement) document.activeElement.blur();
+}
+async function submitAccount() {
+  if (accountBusy) return;
+  const pinEl = document.getElementById('pinInput'), msg = document.getElementById('accountMsg');
+  const name = cleanName(document.getElementById('nameInput').value), pin = pinEl.value.replace(/\D/g, '');
+  if (!name) { msg.textContent = 'TYPE A NAME'; return; }
+  if (pin.length !== 4) { msg.textContent = ERR_TEXT.bad_pin; return; }
+  accountBusy = true; msg.textContent = '...';
+  try {
+    const d = await api('login', postJSON({ name, pin, playerId }));
+    playerId = d.playerId; playerName = d.name;
+    store.set('bagman_pid', playerId); store.set('bagman_name', playerName);
+    closeAccount();
+    if (accountFrom === 'over') { document.getElementById('saveScoreBtn').hidden = true; submitRun(); }
+    else { updateBoardWho(); showBoardTab(LB.tab); }
+  } catch (err) {
+    msg.textContent = errText(err); pinEl.value = '';
+  } finally { accountBusy = false; }
+}
+function updateBoardWho() {
+  document.getElementById('boardWho').textContent = playerName ? 'PLAYING AS ' + playerName : 'NOT LOGGED IN';
+  document.getElementById('boardLogin').textContent = playerName ? 'SWITCH' : 'LOG IN';
 }
 const boardOpen = () => !document.getElementById('board').classList.contains('hidden');
 function showBoardTab(tab) {
@@ -496,8 +598,90 @@ function showBoardTab(tab) {
 }
 function openBoard() {
   document.getElementById('board').classList.remove('hidden');
+  updateBoardWho();
   showBoardTab(LB.tab);
   loadBoards().then(() => showBoardTab(LB.tab), () => { document.getElementById('boardNote').textContent = ERR_TEXT.offline; });
+}
+
+// ---------- pause, save & continue ----------
+// A run is saved whenever the player pauses, quits, starts a level or loses a life, and when the
+// phone locks or the tab closes. Continuing restores level, score, lives and the coins left,
+// with everyone back at their starting spots.
+const SAVE_KEY = 'bagman_run';
+function snapshotRun() {
+  if (mode === 'title' || mode === 'over') return null;
+  let lv = level, lf = lives, cs = coins, stats = levelStats;
+  if (mode === 'clear' || mode === 'win') { lv = level + 1; cs = null; stats = { time: 0, eaten: 0 }; }
+  if (mode === 'dying' && --lf <= 0) return null;
+  return {
+    v: 1, level: lv, score, lives: lf, extraGiven, runTime: Math.round(runTime), stats,
+    coins: cs && cs.map(r => r.join('')).join('|'), at: Date.now(),
+  };
+}
+function saveRun() { const s = snapshotRun(); if (s) store.set(SAVE_KEY, JSON.stringify(s)); }
+function clearSavedRun() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
+function loadSavedRun() {
+  let r;
+  try { r = JSON.parse(store.get(SAVE_KEY) || 'null'); } catch (e) { return null; }
+  if (!r || r.v !== 1 || !(r.level >= 1) || !(r.lives >= 1) || !(r.score >= 0)) return null;
+  const rows = typeof r.coins === 'string' ? r.coins.split('|') : null;
+  const valid = rows && rows.length === H && rows.every(row => row.length === W && /^[012]+$/.test(row));
+  r.coins = valid ? rows.map(row => [...row].map(Number)) : null;
+  return r;
+}
+function continueRun() {
+  const r = loadSavedRun();
+  if (!r) return startGame();
+  ensureAudio();
+  level = r.level; score = r.score; lives = r.lives; extraGiven = !!r.extraGiven; runTime = r.runTime || 0;
+  levelStats = r.stats || { time: 0, eaten: 0 };
+  if (r.coins) { coins = r.coins; coinsLeft = coins.flat().filter(Boolean).length; }
+  if (!r.coins || coinsLeft === 0) resetCoins();
+  resetPositions();
+  mode = 'ready'; readyT = 2.5; paused = false;
+  for (const id of ['title', 'over', 'win', 'pauseMenu']) document.getElementById(id).classList.add('hidden');
+  SFX.start(); updateHUD(true);
+}
+function refreshTitle() {
+  const r = loadSavedRun();
+  document.getElementById('titleActions').hidden = !r;
+  document.getElementById('startHint').hidden = !!r;
+  if (r) document.getElementById('continueInfo').textContent = 'LVL ' + r.level + ' · Ð' + r.score.toLocaleString('en-US');
+}
+function pauseGame() {
+  if (paused || (mode !== 'play' && mode !== 'ready')) return;
+  paused = true;
+  saveRun();
+  document.getElementById('pauseStats').textContent = 'LEVEL ' + level + ' · Ð' + score.toLocaleString('en-US');
+  document.getElementById('soundBtn').textContent = 'SOUND: ' + (muted ? 'OFF' : 'ON');
+  document.getElementById('pauseMenu').classList.remove('hidden');
+}
+function resumeGame() {
+  if (!paused) return;
+  paused = false;
+  document.getElementById('pauseMenu').classList.add('hidden');
+  ensureAudio();
+  if (mode === 'play') { mode = 'ready'; readyT = 1.5; } // a beat to get your bearings before the rivals move
+}
+function quitGame() {
+  saveRun();
+  paused = false;
+  document.getElementById('pauseMenu').classList.add('hidden');
+  score = 0; lives = START_LIVES; level = 1;
+  resetCoins(); resetPositions();
+  mode = 'title';
+  document.getElementById('title').classList.remove('hidden');
+  refreshTitle(); updateHUD(true);
+}
+function toggleMute() {
+  muted = !muted;
+  store.set('bagman_muted', muted ? '1' : '0');
+  document.getElementById('soundBtn').textContent = 'SOUND: ' + (muted ? 'OFF' : 'ON');
+}
+let pauseBtnShown = null;
+function syncPauseBtn() {
+  const show = (mode === 'play' || mode === 'ready') && !paused;
+  if (show !== pauseBtnShown) { pauseBtnShown = show; document.getElementById('pauseBtn').classList.toggle('off', !show); }
 }
 
 // ---------- movement ----------
@@ -693,11 +877,30 @@ function update(dt) {
 
 const cxOf = v => (v + 0.5) * T;
 // Doge coin: 4x4 pixel pattern; `k` scales each pixel (1 in the maze, bigger for the win confetti)
-function drawCoin(x, y, k = 1, cx = x * T + 4, cy = y * T + 4) {
-  const P = (px, py, w, h) => ctx.fillRect(cx + px * k, cy + py * k, w * k, h * k);
-  ctx.fillStyle = '#f7c948'; P(1, 0, 2, 1); P(0, 1, 4, 2); P(1, 3, 2, 1);
-  ctx.fillStyle = '#fff3b0'; P(1, 1, 1, 1);
-  ctx.fillStyle = '#c9961a'; P(3, 2, 1, 1); P(2, 3, 1, 1);
+function drawCoin(x, y, k = 1, cx = x * T + 4, cy = y * T + 4, g = ctx) {
+  const P = (px, py, w, h) => g.fillRect(cx + px * k, cy + py * k, w * k, h * k);
+  g.fillStyle = '#f7c948'; P(1, 0, 2, 1); P(0, 1, 4, 2); P(1, 3, 2, 1);
+  g.fillStyle = '#fff3b0'; P(1, 1, 1, 1);
+  g.fillStyle = '#c9961a'; P(3, 2, 1, 1); P(2, 3, 1, 1);
+}
+// Logo: Elon Pac-Man chomping a trail of Doge coins into the BAGMAN wordmark.
+// Animated on the title screen; also used for the app icons and repo images.
+const LOGO_W = 232, LOGO_H = 46;
+function drawLogo(g, t, open = 0.5 - 0.5 * Math.cos(t * 13.6)) {
+  g.clearRect(0, 0, LOGO_W, LOGO_H);
+  const gap = 12, shift = (t * 26) % gap;
+  for (let i = 0; i < 4; i++) {
+    const x = 50 + i * gap - shift;
+    if (x < 44) continue; // already in Elon's mouth
+    g.globalAlpha = Math.max(0, Math.min(1, (86 - x) / gap));
+    drawCoin(0, 0, 2.5, x, 18, g);
+  }
+  g.globalAlpha = 1;
+  g.font = '24px "Press Start 2P", monospace'; g.textBaseline = 'middle'; g.textAlign = 'left';
+  g.fillStyle = '#3060ff'; g.fillText('BAGMAN', 85, 24);
+  g.fillStyle = '#ff5fa2'; g.fillText('BAGMAN', 88, 27);
+  g.fillStyle = '#f7c948'; g.fillText('BAGMAN', 86, 25);
+  drawFace(FACES.elon.normal, 22, 23, 40, open, { g });
 }
 // Win scene: Elon rides a rocket to the moon while Doge coins rain down
 function renderWin() {
@@ -738,26 +941,31 @@ function renderWin() {
 }
 // A face disc with a puppet jaw: the chin drops by `open` (0..1) to reveal a mouth.
 function drawFace(set, x, y, D, open, opts = {}) {
+  const g = opts.g || ctx; // the logo and icons draw onto their own canvases
   const k = D / FACE_RES, myD = set.my * k, drop = open * D * 0.22;
-  ctx.save();
-  ctx.translate(x, y);
-  if (opts.rot) ctx.rotate(opts.rot);
-  if (opts.flip) ctx.scale(-1, 1);
-  if (opts.alpha != null) ctx.globalAlpha = opts.alpha;
-  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  g.save();
+  g.translate(x, y);
+  if (opts.rot) g.rotate(opts.rot);
+  if (opts.flip) g.scale(-1, 1);
+  if (opts.alpha != null) g.globalAlpha = opts.alpha;
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
   if (drop > 0.05) {
     // mouth interior, clipped to the head outline stretched by the dropped jaw
     const yM = -D / 2 + myD, half = Math.sqrt(Math.max(0, (D / 2) ** 2 - yM ** 2));
-    ctx.save();
-    ctx.beginPath(); ctx.arc(0, 0, D / 2, 0, Math.PI * 2); ctx.arc(0, drop, D / 2, 0, Math.PI * 2); ctx.clip();
-    ctx.fillStyle = '#2a0408'; ctx.fillRect(-half, yM - 0.5, half * 2, drop + 1);
-    ctx.fillStyle = '#c23a50'; ctx.beginPath(); ctx.ellipse(0, yM + drop, half * 0.45, drop * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#f4f1ea'; ctx.fillRect(-half * 0.5, yM - 0.2, half, Math.min(1.1, drop * 0.25));
-    ctx.restore();
+    g.save();
+    g.beginPath(); g.arc(0, 0, D / 2, 0, Math.PI * 2); g.arc(0, drop, D / 2, 0, Math.PI * 2); g.clip();
+    g.fillStyle = '#2a0408'; g.fillRect(-half, yM - 0.5, half * 2, drop + 1);
+    g.fillStyle = '#c23a50'; g.beginPath(); g.ellipse(0, yM + drop, half * 0.45, drop * 0.5, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#f4f1ea'; g.fillRect(-half * 0.5, yM - 0.2, half, Math.min(D * 0.05, drop * 0.25));
+    g.restore();
+    // carry the colored outline down both sides of the open jaw so the head stays one shape
+    const inner = Math.sqrt(Math.max(0, (D / 2 - D * 0.06) ** 2 - yM ** 2)), bar = half - inner;
+    g.fillStyle = set.ring;
+    g.fillRect(-half, yM - 0.5, bar, drop + 1); g.fillRect(half - bar, yM - 0.5, bar, drop + 1);
   }
-  ctx.drawImage(set.top, -D / 2, -D / 2, D, D);
-  ctx.drawImage(set.bot, -D / 2, -D / 2 + myD + drop, D, (FACE_RES - set.my) * k);
-  ctx.restore();
+  g.drawImage(set.top, -D / 2, -D / 2, D, D);
+  g.drawImage(set.bot, -D / 2, -D / 2 + myD + drop, D, (FACE_RES - set.my) * k);
+  g.restore();
 }
 function drawGhostBody(x, y, color) {
   const r = 10, top = y - 3, bottom = y + 10, n = 6, ph = Math.floor(time * 8) % 2;
@@ -830,13 +1038,14 @@ function render() {
   if (mode === 'ready') label(level > 1 && readyT > 1.2 ? 'LEVEL ' + level : 'READY!', 11, '#f7c948');
   if (mode === 'dying' && dyingT > 0.6 && killer) label('REKT BY ' + killer.def.killMsg, 11, '#ff4848');
   if (mode === 'clear') label('LEVEL CLEAR!', 11, '#f7c948');
-  if (paused) label('PAUSED', 11, '#fff');
 }
 
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
   update(dt); render();
+  syncPauseBtn();
+  if (mode === 'title') { logoCtx.setTransform(R, 0, 0, R, 0, 0); drawLogo(logoCtx, time); }
   requestAnimationFrame(frame);
 }
 
@@ -855,11 +1064,12 @@ function updateHUD(force) {
 }
 function fit() {
   const availW = window.innerWidth - 32, availH = window.innerHeight - 32 - 30;
-  let s = Math.min(availW / CW, availH / (CH + 26));
+  let s = Math.min(availW / CW, availH / (CH + 26), (availH - 52) / CH);
   if (s >= 3) s = Math.floor(s); else if (s >= 2) s = Math.floor(s * 2) / 2;
   s = Math.max(0.8, s);
   R = Math.max(1, Math.round(s * (window.devicePixelRatio || 1)));
   cv.width = CW * R; cv.height = CH * R;
+  logoCanvas.width = LOGO_W * R; logoCanvas.height = LOGO_H * R;
   document.documentElement.style.setProperty('--s', s);
   cv.style.width = CW * s + 'px'; cv.style.height = CH * s + 'px';
   document.getElementById('hud').style.width = CW * s + 'px';
@@ -884,18 +1094,18 @@ function setDir(d) {
 }
 const creditsOpen = () => !document.getElementById('credits').classList.contains('hidden');
 function tryStart() {
-  if (creditsOpen() || boardOpen()) return;
-  if (mode === 'title') startGame();
+  if (creditsOpen() || boardOpen() || accountOpen()) return;
+  if (paused) return resumeGame();
+  if (mode === 'title') loadSavedRun() ? continueRun() : startGame();
   else if (mode === 'over' && time >= restartAt) startGame();
   else if (mode === 'win' && winT >= 1.2) nextLevel();
 }
-function togglePause() { if (mode === 'play' || mode === 'ready') paused = !paused; }
-const nameInput = document.getElementById('nameInput');
+const nameInput = document.getElementById('nameInput'), pinInput = document.getElementById('pinInput');
 window.addEventListener('keydown', e => {
-  if (e.target === nameInput) {
-    // Enter saves the name; Enter on an empty box just retries
-    if (e.key === 'Enter') { e.preventDefault(); if (cleanName(nameInput.value)) saveName(); else { nameInput.blur(); tryStart(); } }
-    else if (e.key === 'Escape') nameInput.blur();
+  if (accountOpen()) {
+    // typing goes to the name / PIN boxes, not the game
+    if (e.key === 'Escape') closeAccount();
+    else if (e.key === 'Enter') { e.preventDefault(); if (e.target === nameInput) pinInput.focus(); else submitAccount(); }
     return;
   }
   if (e.code === 'Escape' && (creditsOpen() || boardOpen())) {
@@ -903,18 +1113,30 @@ window.addEventListener('keydown', e => {
   }
   if (KEYMAP[e.code]) { e.preventDefault(); setDir(KEYMAP[e.code]); return; }
   if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); tryStart(); }
-  else if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
-  else if (e.code === 'KeyM') muted = !muted;
+  else if (e.code === 'KeyP' || e.code === 'Escape') paused ? resumeGame() : pauseGame();
+  else if (e.code === 'KeyM') toggleMute();
+  else if (e.code === 'KeyN' && mode === 'title' && !creditsOpen() && !boardOpen()) startGame();
 });
 nameInput.addEventListener('input', () => { nameInput.value = cleanName(nameInput.value); });
-document.getElementById('nameRow').addEventListener('pointerdown', e => e.stopPropagation());
-document.getElementById('nameSave').addEventListener('click', saveName);
+pinInput.addEventListener('input', () => { pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4); });
+document.getElementById('saveScoreBtn').addEventListener('pointerdown', e => e.stopPropagation());
+document.getElementById('saveScoreBtn').addEventListener('click', () => openAccount('over'));
+document.getElementById('boardLogin').addEventListener('click', () => openAccount('board'));
+document.getElementById('accountGo').addEventListener('click', submitAccount);
+document.getElementById('accountBack').addEventListener('click', closeAccount);
 document.getElementById('title').addEventListener('pointerdown', tryStart);
-document.getElementById('over').addEventListener('pointerdown', () => {
-  // first tap outside the name box only closes the keyboard
-  if (document.activeElement === nameInput) nameInput.blur(); else tryStart();
-});
+document.getElementById('over').addEventListener('pointerdown', tryStart);
 document.getElementById('win').addEventListener('pointerdown', tryStart);
+// buttons act on click; stopping pointerdown keeps the overlay underneath from starting a game
+for (const id of ['pauseBtn', 'resumeBtn', 'soundBtn', 'quitBtn', 'continueBtn', 'newGameBtn']) {
+  document.getElementById(id).addEventListener('pointerdown', e => e.stopPropagation());
+}
+document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+document.getElementById('soundBtn').addEventListener('click', toggleMute);
+document.getElementById('quitBtn').addEventListener('click', quitGame);
+document.getElementById('continueBtn').addEventListener('click', continueRun);
+document.getElementById('newGameBtn').addEventListener('click', startGame);
 document.getElementById('creditsLink').addEventListener('pointerdown', e => {
   e.stopPropagation(); document.getElementById('credits').classList.remove('hidden');
 });
@@ -925,7 +1147,7 @@ document.querySelectorAll('#board .tabs .btn').forEach(b => b.addEventListener('
 let touch = null;
 window.addEventListener('touchstart', e => { const t = e.changedTouches[0]; touch = { x: t.clientX, y: t.clientY }; ensureAudio(); }, { passive: true });
 window.addEventListener('touchmove', e => {
-  if (creditsOpen() || boardOpen()) return;
+  if (creditsOpen() || boardOpen() || accountOpen()) return;
   e.preventDefault();
   if (!touch) return;
   const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
@@ -935,7 +1157,11 @@ window.addEventListener('touchmove', e => {
   }
 }, { passive: false });
 window.addEventListener('touchend', () => { touch = null; });
-document.addEventListener('visibilitychange', () => { if (document.hidden && (mode === 'play' || mode === 'ready')) paused = true; });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) return;
+  if (mode === 'play' || mode === 'ready') pauseGame(); else saveRun();
+});
+window.addEventListener('pagehide', saveRun);
 window.addEventListener('resize', fit);
 
 // ---------- boot ----------
@@ -966,7 +1192,7 @@ window.addEventListener('resize', fit);
   av.width = av.height = FACE_RES;
   av.getContext('2d').drawImage(FACES.elon.normal.full, 0, 0);
 
-  resetCoins(); resetPositions(); fit(); updateHUD(true);
+  resetCoins(); resetPositions(); fit(); updateHUD(true); refreshTitle();
   loadBoards().then(() => { LB.online = true; }, () => { document.body.classList.add('no-lb'); });
   const go = () => requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
   if (document.fonts && document.fonts.load) {

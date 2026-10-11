@@ -8,6 +8,10 @@ const TOP_N = 10;
 const RANK_SCAN_LIMIT = 1000;       // ranks past this show as "1000+" (keeps D1 reads cheap)
 const NAME_RE = /^[A-Z0-9_]{1,12}$/;
 const PLAYER_ID_RE = /^[a-f0-9-]{16,40}$/;
+const PIN_RE = /^\d{4}$/;
+const LOGINS_PER_HOUR = 20;         // per IP, claims and logins together
+const MAX_PIN_TRIES = 5;            // wrong PINs in a row before the name locks
+const LOCK_MS = 15 * 60 * 1000;
 
 // Not allowed anywhere in a name, checked after mapping look-alike digits to letters (0->O, 1->I, ...).
 const BLOCKED = ['FUCK', 'SHIT', 'CUNT', 'BITCH', 'DICK', 'COCK', 'PUSSY', 'NIGG', 'FAGG', 'RETARD',
@@ -20,6 +24,7 @@ export default {
     try {
       if (url.pathname === '/api/leaderboard' && request.method === 'GET') return await getLeaderboard(url, env, ctx);
       if (url.pathname === '/api/score' && request.method === 'POST') return await postScore(request, env);
+      if (url.pathname === '/api/login' && request.method === 'POST') return await login(request, env);
       if (url.pathname === '/api/admin/delete' && request.method === 'POST') return await adminDelete(request, env);
       return json({ error: 'not_found' }, 404);
     } catch (err) {
@@ -43,10 +48,22 @@ function isBlocked(name) {
   return BLOCKED.some(w => plain.includes(w));
 }
 
+const toHex = bytes => [...new Uint8Array(bytes)].map(b => b.toString(16).padStart(2, '0')).join('');
+
 async function sha256Hex(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
+  return toHex(buf).slice(0, 32);
 }
+
+// Keyed with the SALT secret, so a leaked database alone can't be brute-forced for PINs.
+// Changing SALT after launch invalidates every PIN.
+async function pinHash(env, salt, name, pin) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.SALT || 'local-dev'),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return toHex(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${salt}:${name}:${pin}`)));
+}
+
+const ipHashOf = (request, env) => sha256Hex((env.SALT || '') + (request.headers.get('CF-Connecting-IP') || 'local'));
 
 async function topList(env, board) {
   const { results } = await env.DB.prepare(
@@ -94,7 +111,11 @@ async function postScore(request, env) {
     return json({ error: 'implausible' }, 422);
   }
 
-  const ipHash = await sha256Hex((env.SALT || '') + (request.headers.get('CF-Connecting-IP') || 'local'));
+  // only the player who owns a name can post scores under it (see /api/login)
+  const owner = await env.DB.prepare('SELECT player_id FROM names WHERE name = ?').bind(name).first('player_id');
+  if (owner !== playerId) return json({ error: owner ? 'name_taken' : 'not_logged_in' }, 403);
+
+  const ipHash = await ipHashOf(request, env);
   const now = Date.now();
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM scores WHERE ip_hash = ? AND created_at > ?')
     .bind(ipHash, now - 3600 * 1000).first('n');
@@ -121,12 +142,60 @@ async function postScore(request, env) {
   return json({ ok: true, day, rankToday, rankAll, today: todayRows, all: allRows });
 }
 
-// POST /api/admin/delete {name} with header X-Admin-Key -> removes that name from every board
+// POST /api/login {name, pin, playerId}
+// A free name is claimed for this player with that PIN. A taken name + the right PIN logs in:
+// the response carries the owner's playerId, which the device then uses from now on.
+async function login(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== 'object') return json({ error: 'bad_request' }, 400);
+  const name = String(body.name ?? '').toUpperCase().replace(/[^A-Z0-9_]/g, '').slice(0, 12);
+  const pin = String(body.pin ?? '');
+  const playerId = String(body.playerId ?? '').toLowerCase();
+  if (!NAME_RE.test(name)) return json({ error: 'bad_name' }, 400);
+  if (isBlocked(name)) return json({ error: 'blocked_name' }, 400);
+  if (!PIN_RE.test(pin)) return json({ error: 'bad_pin' }, 400);
+  if (!PLAYER_ID_RE.test(playerId)) return json({ error: 'bad_request' }, 400);
+
+  const ipHash = await ipHashOf(request, env);
+  const now = Date.now();
+  const tries = await env.DB.prepare('SELECT COUNT(*) AS n FROM login_attempts WHERE ip_hash = ? AND created_at > ?')
+    .bind(ipHash, now - 3600 * 1000).first('n');
+  if (tries >= LOGINS_PER_HOUR) return json({ error: 'rate_limited' }, 429);
+  await env.DB.prepare('INSERT INTO login_attempts (ip_hash, created_at) VALUES (?, ?)').bind(ipHash, now).run();
+
+  let row = await env.DB.prepare('SELECT * FROM names WHERE name = ?').bind(name).first();
+  if (!row) {
+    const salt = toHex(crypto.getRandomValues(new Uint8Array(16)));
+    const { meta } = await env.DB.prepare(
+      'INSERT OR IGNORE INTO names (name, player_id, pin_hash, pin_salt, created_at) VALUES (?, ?, ?, ?, ?)'
+    ).bind(name, playerId, await pinHash(env, salt, name, pin), salt, now).run();
+    if (meta.changes === 1) return json({ ok: true, name, playerId, created: true });
+    row = await env.DB.prepare('SELECT * FROM names WHERE name = ?').bind(name).first(); // claimed a moment ago
+  }
+  if (row.locked_until > now) {
+    return json({ error: 'locked', retryInSeconds: Math.ceil((row.locked_until - now) / 1000) }, 429);
+  }
+  if (await pinHash(env, row.pin_salt, name, pin) !== row.pin_hash) {
+    const failed = row.failed + 1, lock = failed >= MAX_PIN_TRIES;
+    await env.DB.prepare('UPDATE names SET failed = ?, locked_until = ? WHERE name = ?')
+      .bind(lock ? 0 : failed, lock ? now + LOCK_MS : 0, name).run();
+    return lock
+      ? json({ error: 'locked', retryInSeconds: LOCK_MS / 1000 }, 429)
+      : json({ error: 'wrong_pin', attemptsLeft: MAX_PIN_TRIES - failed }, 401);
+  }
+  if (row.failed) await env.DB.prepare('UPDATE names SET failed = 0 WHERE name = ?').bind(name).run();
+  return json({ ok: true, name, playerId: row.player_id, created: false });
+}
+
+// POST /api/admin/delete {name, release?} with header X-Admin-Key -> removes that name from every board.
+// release: true also frees the name (e.g. a player forgot their PIN), otherwise it stays reserved.
 async function adminDelete(request, env) {
   if (!env.ADMIN_KEY || request.headers.get('X-Admin-Key') !== env.ADMIN_KEY) return json({ error: 'forbidden' }, 403);
   const body = await request.json().catch(() => ({}));
   const name = String(body.name ?? '').toUpperCase();
   if (!NAME_RE.test(name)) return json({ error: 'bad_name' }, 400);
   const { meta } = await env.DB.prepare('DELETE FROM best WHERE name = ?').bind(name).run();
-  return json({ ok: true, deleted: meta.changes });
+  let released = 0;
+  if (body.release === true) released = (await env.DB.prepare('DELETE FROM names WHERE name = ?').bind(name).run()).meta.changes;
+  return json({ ok: true, deleted: meta.changes, released });
 }
