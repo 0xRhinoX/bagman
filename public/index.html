@@ -163,6 +163,7 @@ body{font-family:"Press Start 2P",ui-monospace,monospace;display:flex;align-item
       <div class="pause-title">PAUSED</div>
       <div class="go-small" id="pauseStats"></div>
       <button class="menu-btn" id="resumeBtn">RESUME</button>
+      <button class="menu-btn alt lb" id="pauseBoardBtn">LEADERBOARD</button>
       <button class="menu-btn alt" id="soundBtn">SOUND: ON</button>
       <button class="menu-btn alt" id="quitBtn">SAVE &amp; QUIT</button>
       <div class="go-small">CONTINUE ANYTIME<br>FROM THE TITLE SCREEN</div>
@@ -560,8 +561,8 @@ function openAccount(from) {
   accountFrom = from;
   const name = document.getElementById('nameInput'), pin = document.getElementById('pinInput');
   name.value = playerName; pin.value = '';
-  document.getElementById('accountMsg').textContent = '';
-  document.getElementById('accountGo').textContent = from === 'board' ? 'LOG IN' : 'SAVE';
+  document.getElementById('accountMsg').textContent = from === 'start' ? 'PICK A NAME AND PIN TO PLAY' : '';
+  document.getElementById('accountGo').textContent = from === 'board' ? 'LOG IN' : from === 'start' ? 'PLAY' : 'SAVE';
   document.getElementById('accountBack').textContent = from === 'quit' ? 'SKIP' : 'CANCEL';
   document.getElementById('account').classList.remove('hidden');
   if (!IS_TOUCH) (name.value ? pin : name).focus();
@@ -587,6 +588,7 @@ async function submitAccount() {
     closeAccount();
     if (from === 'over') { document.getElementById('saveScoreBtn').hidden = true; submitRun(); }
     else if (from === 'board') { updateBoardWho(); showBoardTab(LB.tab); }
+    else if (from === 'start') startGame();
   } catch (err) {
     msg.textContent = errText(err); pinEl.value = '';
   } finally { accountBusy = false; }
@@ -1111,9 +1113,14 @@ const creditsOpen = () => !document.getElementById('credits').classList.contains
 function tryStart() {
   if (creditsOpen() || boardOpen() || accountOpen()) return;
   if (paused) return resumeGame();
-  if (mode === 'title') loadSavedRun() ? continueRun() : startGame();
-  else if (mode === 'over' && time >= restartAt) startGame();
+  if (mode === 'title') loadSavedRun() ? continueRun() : requestNewGame();
+  else if (mode === 'over' && time >= restartAt) requestNewGame();
   else if (mode === 'win' && winT >= 1.2) nextLevel();
+}
+// A name + PIN is required to start a new game (skipped only if the leaderboard server is unreachable).
+function requestNewGame() {
+  if (LB.online && !playerName) return openAccount('start');
+  startGame();
 }
 const nameInput = document.getElementById('nameInput'), pinInput = document.getElementById('pinInput');
 window.addEventListener('keydown', e => {
@@ -1130,7 +1137,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); tryStart(); }
   else if (e.code === 'KeyP' || e.code === 'Escape') paused ? resumeGame() : pauseGame();
   else if (e.code === 'KeyM') toggleMute();
-  else if (e.code === 'KeyN' && mode === 'title' && !creditsOpen() && !boardOpen()) startGame();
+  else if (e.code === 'KeyN' && mode === 'title' && !creditsOpen() && !boardOpen()) requestNewGame();
 });
 nameInput.addEventListener('input', () => { nameInput.value = cleanName(nameInput.value); });
 pinInput.addEventListener('input', () => { pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4); });
@@ -1149,9 +1156,10 @@ for (const id of ['pauseBtn', 'resumeBtn', 'soundBtn', 'quitBtn', 'continueBtn',
 document.getElementById('pauseBtn').addEventListener('click', pauseGame);
 document.getElementById('resumeBtn').addEventListener('click', resumeGame);
 document.getElementById('soundBtn').addEventListener('click', toggleMute);
+document.getElementById('pauseBoardBtn').addEventListener('click', openBoard);
 document.getElementById('quitBtn').addEventListener('click', quitGame);
 document.getElementById('continueBtn').addEventListener('click', continueRun);
-document.getElementById('newGameBtn').addEventListener('click', startGame);
+document.getElementById('newGameBtn').addEventListener('click', requestNewGame);
 document.getElementById('creditsLink').addEventListener('pointerdown', e => {
   e.stopPropagation(); document.getElementById('credits').classList.remove('hidden');
 });
