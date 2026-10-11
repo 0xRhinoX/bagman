@@ -744,9 +744,31 @@ function ghostTarget(g) {
   }
   return { x: px, y: py };
 }
+// Steps from every tile to the house door (BFS, tunnel included). Eaten rivals follow it home:
+// the arcade "aim straight at the target" rule can circle a small wall block forever in this maze.
+const DOOR_DIST = (() => {
+  const dist = MAZE.map(r => [...r].map(() => Infinity)), q = [[HOUSE_DOOR.x, HOUSE_DOOR.y]];
+  dist[HOUSE_DOOR.y][HOUSE_DOOR.x] = 0;
+  for (let i = 0; i < q.length; i++) {
+    const [x, y] = q[i];
+    for (const d of DIR_LIST) {
+      const nx = ((x + d.x) % W + W) % W, ny = y + d.y;
+      if (open(nx, ny) && dist[ny][nx] === Infinity) { dist[ny][nx] = dist[y][x] + 1; q.push([nx, ny]); }
+    }
+  }
+  return dist;
+})();
 function decideGhost(g) {
   const cx = Math.round(g.x), cy = Math.round(g.y);
-  if (g.state === 'eaten' && cx === HOUSE_DOOR.x && cy === HOUSE_DOOR.y) { g.state = 'entering'; g.dir = NONE; return; }
+  if (g.state === 'eaten') {
+    if (cx === HOUSE_DOOR.x && cy === HOUSE_DOOR.y) { g.state = 'entering'; g.dir = NONE; return; }
+    let best = g.dir, bd = Infinity;
+    for (const d of DIR_LIST) {
+      const nx = ((cx + d.x) % W + W) % W, ny = cy + d.y;
+      if (open(nx, ny) && DOOR_DIST[ny][nx] < bd) { bd = DOOR_DIST[ny][nx]; best = d; }
+    }
+    g.dir = best; return;
+  }
   let opts = DIR_LIST.filter(d => d !== rev(g.dir) && open(cx + d.x, cy + d.y));
   if (!opts.length) opts = [rev(g.dir)];
   if (g.frightened || (g.state === 'active' && opts.length > 1 && Math.random() < wanderChance())) {
