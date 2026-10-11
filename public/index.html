@@ -561,13 +561,15 @@ function openAccount(from) {
   const name = document.getElementById('nameInput'), pin = document.getElementById('pinInput');
   name.value = playerName; pin.value = '';
   document.getElementById('accountMsg').textContent = '';
-  document.getElementById('accountGo').textContent = from === 'over' ? 'SAVE' : 'LOG IN';
+  document.getElementById('accountGo').textContent = from === 'board' ? 'LOG IN' : 'SAVE';
+  document.getElementById('accountBack').textContent = from === 'quit' ? 'SKIP' : 'CANCEL';
   document.getElementById('account').classList.remove('hidden');
   if (!IS_TOUCH) (name.value ? pin : name).focus();
 }
 function closeAccount() {
   document.getElementById('account').classList.add('hidden');
   if (document.activeElement) document.activeElement.blur();
+  if (accountFrom === 'quit') { accountFrom = null; finishQuit(); }
 }
 async function submitAccount() {
   if (accountBusy) return;
@@ -580,9 +582,11 @@ async function submitAccount() {
     const d = await api('login', postJSON({ name, pin, playerId }));
     playerId = d.playerId; playerName = d.name;
     store.set('bagman_pid', playerId); store.set('bagman_name', playerName);
+    if (accountFrom === 'quit') submitScore().catch(() => {}); // sends the score before quitting resets it
+    const from = accountFrom;
     closeAccount();
-    if (accountFrom === 'over') { document.getElementById('saveScoreBtn').hidden = true; submitRun(); }
-    else { updateBoardWho(); showBoardTab(LB.tab); }
+    if (from === 'over') { document.getElementById('saveScoreBtn').hidden = true; submitRun(); }
+    else if (from === 'board') { updateBoardWho(); showBoardTab(LB.tab); }
   } catch (err) {
     msg.textContent = errText(err); pinEl.value = '';
   } finally { accountBusy = false; }
@@ -668,8 +672,16 @@ function resumeGame() {
 }
 function quitGame() {
   saveRun();
-  paused = false;
   document.getElementById('pauseMenu').classList.add('hidden');
+  if (LB.online && score > 0) {
+    // put the score on the leaderboard too; without a name yet, ask for one first (SKIP just quits)
+    if (!playerName) return openAccount('quit');
+    submitScore().catch(err => { if (needsLogin(err)) forgetLogin(); });
+  }
+  finishQuit();
+}
+function finishQuit() {
+  paused = false;
   score = 0; lives = START_LIVES; level = 1;
   resetCoins(); resetPositions();
   mode = 'title';
